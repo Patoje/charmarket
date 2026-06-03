@@ -4,12 +4,16 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/components/CartContext";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
 import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createCheckoutOrder } from "../actions/orders";
 
 export function CartDrawer({ dolarValue }: { dolarValue: number }) {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, totalItems } = useCart();
   const [animate, setAnimate] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (totalItems > 0) {
@@ -30,19 +34,58 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
   const totalUsd = calculateSubtotal();
   const totalArs = totalUsd * dolarValue;
 
-  const handleCheckout = () => {
-    let message = "*Nuevo Pedido Charmarket* 🛒\n\n";
-    items.forEach((item) => {
-      const isMayorista = item.quantity >= 5;
-      const price = isMayorista ? Number(item.product.priceUsdMayorista) : Number(item.product.priceUsdMinorista);
-      message += `• ${item.quantity}x ${item.product.name} (USD ${price.toFixed(2)} c/u)\n`;
-    });
-    
-    message += `\n*Total USD:* $${totalUsd.toFixed(2)}`;
-    message += `\n*Total ARS:* $${Math.round(totalArs).toLocaleString("es-AR")}`;
-    
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/5493513486735?text=${encodedMessage}`, "_blank");
+  const handleCheckout = async () => {
+    if (!customerName.trim()) {
+      alert("Por favor ingresa tu nombre para continuar.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Registrar la orden en la base de datos
+      const orderItems = items.map((item) => {
+        const isMayorista = item.quantity >= 5;
+        const price = isMayorista ? Number(item.product.priceUsdMayorista) : Number(item.product.priceUsdMinorista);
+        return {
+          productId: item.product.id,
+          quantity: item.quantity,
+          priceUsdSnapshot: price,
+        };
+      });
+
+      const res = await createCheckoutOrder(customerName, totalUsd, orderItems);
+
+      if (!res.success) {
+        alert(res.error || "Error al procesar el pedido.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const { orderNumber } = res;
+
+      let message = `*Nuevo Pedido Charmarket* 🛒\n*Orden:* ${orderNumber}\n*Cliente:* ${customerName}\n\n`;
+      items.forEach((item) => {
+        const isMayorista = item.quantity >= 5;
+        const price = isMayorista ? Number(item.product.priceUsdMayorista) : Number(item.product.priceUsdMinorista);
+        message += `• ${item.quantity}x ${item.product.name} (USD ${price.toFixed(2)} c/u)\n`;
+      });
+      
+      message += `\n*Total USD:* $${totalUsd.toFixed(2)}`;
+      message += `\n*Total ARS:* $${Math.round(totalArs).toLocaleString("es-AR")}`;
+      
+      const encodedMessage = encodeURIComponent(message);
+      window.location.href = `https://wa.me/5493513486735?text=${encodedMessage}`;
+      
+      clearCart();
+      setIsCartOpen(false);
+      setCustomerName("");
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error al crear tu pedido. Intenta de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -115,12 +158,21 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
               </div>
             </div>
             
+            <div className="pt-2">
+              <Input 
+                placeholder="Ingresa tu nombre..." 
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="h-12 border-border focus-visible:ring-primary font-bold"
+              />
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" className="h-12 rounded-lg text-xs uppercase tracking-widest font-bold border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={clearCart}>
                 Vaciar Carrito
               </Button>
-              <Button onClick={handleCheckout} className="h-12 rounded-lg text-xs uppercase tracking-widest font-bold bg-[#25D366] hover:bg-[#128C7E] text-white border-none">
-                WhatsApp
+              <Button onClick={handleCheckout} disabled={isSubmitting} className="h-12 rounded-lg text-xs uppercase tracking-widest font-bold bg-[#25D366] hover:bg-[#128C7E] text-white border-none">
+                {isSubmitting ? "Procesando..." : "WhatsApp"}
               </Button>
             </div>
           </div>

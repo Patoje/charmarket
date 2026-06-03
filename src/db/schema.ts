@@ -48,8 +48,11 @@ export const users = pgTable("users", {
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  status: text("status").notNull().default("pending"), // "pending", "paid", "shipped", "cancelled"
+  userId: integer("user_id").references(() => users.id),
+  orderNumber: text("order_number").notNull().unique(),
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+  status: text("status").notNull().default("pending"), // "pending", "accepted", "rejected", "paid", "shipped", "cancelled"
   totalUsd: numeric("total_usd", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
