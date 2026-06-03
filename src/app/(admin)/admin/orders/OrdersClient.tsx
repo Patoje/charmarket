@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Clock } from "lucide-react";
 
-export function OrdersClient({ orders }: { orders: any[] }) {
+export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue: number }) {
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<{ id: number; type: "accept" | "reject" } | null>(null);
@@ -59,7 +59,8 @@ export function OrdersClient({ orders }: { orders: any[] }) {
               </div>
               <div className="text-right">
                 <div className="text-lg font-bold text-primary">USD {order.totalUsd}</div>
-                {order.customerName && <div className="text-sm">Cliente: {order.customerName}</div>}
+                <div className="text-sm font-semibold text-muted-foreground mt-0.5">ARS ${(Number(order.totalUsd) * dolarValue).toLocaleString("es-AR")}</div>
+                {order.customerName && <div className="text-sm mt-1">Cliente: {order.customerName}</div>}
               </div>
             </CardHeader>
             <CardContent className="pt-4">
