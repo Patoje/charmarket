@@ -17,7 +17,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
   // Estados de Filtros
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("Todas");
+  const [categoryFilter, setCategoryFilter] = useState("Todas las categorías");
   const [sortBy, setSortBy] = useState("none");
   
   // Filtros Avanzados
@@ -52,7 +52,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
     }
 
     // 2. Filtro por Categoría
-    if (categoryFilter !== "Todas") {
+    if (categoryFilter !== "Todas las categorías") {
       result = result.filter(p => p.categoryName === categoryFilter);
     }
 
@@ -144,7 +144,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               <SelectValue placeholder="Categoría" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Todas">Todas las categorías</SelectItem>
+              <SelectItem value="Todas las categorías">Todas las categorías</SelectItem>
               {categories.map((cat: any) => (
                 <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
               ))}
