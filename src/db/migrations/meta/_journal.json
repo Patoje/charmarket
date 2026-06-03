@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780491714214,
+      "tag": "0000_minor_ikaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780491905160,
+      "tag": "0001_clear_sue_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780492124297,
+      "tag": "0002_flaky_chronomancer",
+      "breakpoints": true
+    }
+  ]
+}

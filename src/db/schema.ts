@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, numeric } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric, index } from "drizzle-orm/pg-core";
 
 export const globalConfigs = pgTable("global_configs", {
   id: serial("id").primaryKey(),
@@ -11,6 +11,8 @@ export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
 });
 
 export const products = pgTable("products", {
@@ -20,14 +22,43 @@ export const products = pgTable("products", {
   imageUrl: text("image_url"),
   categoryId: integer("category_id").references(() => categories.id).notNull(),
   language: text("language").notNull(),
-  priceUsdMinorista: numeric("price_usd_minorista").notNull(),
-  priceUsdMayorista: numeric("price_usd_mayorista").notNull(),
+  priceUsdMinorista: numeric("price_usd_minorista", { precision: 10, scale: 2 }).notNull(),
+  priceUsdMayorista: numeric("price_usd_mayorista", { precision: 10, scale: 2 }).notNull(),
   stock: integer("stock").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
-});
+  sku: text("sku").unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+  deletedAt: timestamp("deleted_at"),
+}, (table) => ({
+  categoryIdIdx: index("category_id_idx").on(table.categoryId),
+  isActiveIdx: index("is_active_idx").on(table.isActive),
+  languageIdx: index("language_idx").on(table.language),
+}));
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   name: text("name"),
+  role: text("role").notNull().default("customer"),
+  passwordHash: text("password_hash"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  status: text("status").notNull().default("pending"), // "pending", "paid", "shipped", "cancelled"
+  totalUsd: numeric("total_usd", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
+export const orderItems = pgTable("order_items", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").references(() => orders.id).notNull(),
+  productId: integer("product_id").references(() => products.id).notNull(),
+  quantity: integer("quantity").notNull(),
+  priceUsdSnapshot: numeric("price_usd_snapshot", { precision: 10, scale: 2 }).notNull(),
 });
