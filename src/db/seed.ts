@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { categories, globalConfigs } from "./schema";
 import * as dotenv from "dotenv";
+import { sql } from "drizzle-orm";
 
 dotenv.config({ path: ".env" });
 dotenv.config({ path: ".env.local" });
@@ -33,37 +34,63 @@ const categoryNames = [
 ];
 
 async function seed() {
-  console.log("Seeding global configurations...");
+  console.log("⏳ Iniciando proceso de Seeding...");
+
   try {
-    await db.insert(globalConfigs).values({
-      key: "dolar_charmarket",
-      value: "1000",
-    });
-    console.log("Inserted dolar_charmarket");
+    // 1. VALIDACIÓN PREVIA DE CONEXIÓN
+    await db.execute(sql`SELECT 1`);
+    console.log("✅ Conexión a la base de datos establecida correctamente.\n");
   } catch (error) {
-    console.log("Failed to insert dolar_charmarket (maybe already exists)");
+    console.error("❌ Falló la conexión a PostgreSQL. Verifica tu DATABASE_URL.");
+    console.error(error);
+    process.exit(1);
   }
 
-  console.log("Seeding categories...");
-  const data = categoryNames.map((name) => ({
-    name,
-    slug: toKebabCase(name),
-  }));
+  try {
+    // 2. TRANSACCIÓN
+    await db.transaction(async (tx) => {
+      
+      // 3. UPSERT Y LOGGING: globalConfigs
+      const configData = { key: "dolar_charmarket", value: "1000" };
+      const configInserted = await tx.insert(globalConfigs)
+        .values(configData)
+        .onConflictDoNothing({ target: globalConfigs.key })
+        .returning();
+      
+      if (configInserted.length > 0) {
+        console.log(`✅ [GlobalConfigs] Insertado: 'dolar_charmarket' = 1000`);
+      } else {
+        console.log(`⏭️ [GlobalConfigs] Saltado: 'dolar_charmarket' ya existía.`);
+      }
 
-  for (const cat of data) {
-    try {
-      await db.insert(categories).values(cat);
-      console.log(`Inserted ${cat.name}`);
-    } catch (error) {
-      console.log(`Failed to insert ${cat.name} (maybe already exists)`);
-    }
+      // 4. UPSERT Y LOGGING: Categorías
+      const categoriesData = categoryNames.map((name) => ({
+        name,
+        slug: toKebabCase(name),
+      }));
+
+      // Inserción en bloque (batch insert) con Upsert
+      const categoriesInserted = await tx.insert(categories)
+        .values(categoriesData)
+        .onConflictDoNothing({ target: categories.slug })
+        .returning();
+
+      const skippedCount = categoriesData.length - categoriesInserted.length;
+      console.log(`\n✅ [Categorías] Insertadas: ${categoriesInserted.length}`);
+      console.log(`⏭️ [Categorías] Saltadas (ya existían): ${skippedCount}`);
+      
+      if (categoriesInserted.length > 0) {
+        console.log("   Nuevas categorías agregadas:", categoriesInserted.map(c => c.name).join(", "));
+      }
+    });
+
+    console.log("\n🎉 Seeding finalizado exitosamente.");
+  } catch (err) {
+    console.error("\n❌ Error durante la transacción de seeding. Haciendo ROLLBACK...", err);
+    process.exit(1);
+  } finally {
+    await client.end();
   }
-
-  console.log("Seeding finished.");
-  process.exit(0);
 }
 
-seed().catch((err) => {
-  console.error("Error seeding:", err);
-  process.exit(1);
-});
+seed();
