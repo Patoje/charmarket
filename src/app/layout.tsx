@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, Raleway } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   description: "La mejor tienda de cartas coleccionables y TCG",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#1a0f06",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,6 +35,7 @@ export default function RootLayout({
       className={`${cinzel.variable} ${raleway.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >
+      {/* FORZADO A MODO OSCURO: Por decisión de marca (Estética Charmander) no se soporta modo claro */}
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans" suppressHydrationWarning>
         {/* Skip Link para accesibilidad */}
         <a 
