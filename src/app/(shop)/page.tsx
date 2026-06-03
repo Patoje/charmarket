@@ -13,9 +13,18 @@ export default async function ShopPage() {
   const dolarValue = await getDolarValue();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+      {/* Charmander Decorativo */}
+      <div className="absolute top-0 right-[-40px] md:right-[-80px] opacity-65 pointer-events-none z-0">
+        <img 
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" 
+          alt="Charmander Decorativo"
+          className="h-[280px] w-auto object-contain drop-shadow-2xl"
+        />
+      </div>
+
       {/* Navbar Minimalista */}
-      <nav className="flex items-center justify-between py-6 px-8 border-b border-border/50">
+      <nav className="flex items-center justify-between py-6 px-8 border-b border-border/50 relative z-10">
         <div className="flex items-center gap-8">
           <Link href="/" className="font-heading font-bold text-2xl tracking-wider text-foreground">
             CHARMARKET
@@ -43,14 +52,7 @@ export default async function ShopPage() {
           </p>
         </div>
 
-        {/* Charmander Decorativo */}
-        <div className="absolute top-1/2 -translate-y-1/2 -right-12 md:-right-20 opacity-65 pointer-events-none z-0">
-          <img 
-            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" 
-            alt="Charmander Decorativo"
-            className="h-[280px] w-auto object-contain drop-shadow-2xl"
-          />
-        </div>
+
 
 
 
