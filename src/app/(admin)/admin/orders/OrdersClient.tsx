@@ -5,29 +5,39 @@ import { acceptOrder, rejectOrder } from "@/app/actions/admin-orders";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Clock } from "lucide-react";
 
 export function OrdersClient({ orders }: { orders: any[] }) {
   const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogAction, setDialogAction] = useState<{ id: number; type: "accept" | "reject" } | null>(null);
 
   const pendientes = orders.filter((o) => o.status === "pending");
   const aceptadas = orders.filter((o) => o.status === "accepted");
   const rechazadas = orders.filter((o) => o.status === "rejected");
 
   const handleAction = async (orderId: number, action: "accept" | "reject") => {
-    if (!confirm(`¿Estás seguro de que deseas ${action === "accept" ? "ACEPTAR" : "RECHAZAR"} la orden? ${action === "accept" ? "Esto descontará stock de los productos." : ""}`)) {
-      return;
-    }
+    setDialogAction({ id: orderId, type: action });
+    setDialogOpen(true);
+  };
 
-    setLoadingId(orderId);
+  const confirmAction = async () => {
+    if (!dialogAction) return;
+    const { id, type } = dialogAction;
+    
+    setLoadingId(id);
+    setDialogOpen(false);
+    
     try {
-      const res = action === "accept" ? await acceptOrder(orderId) : await rejectOrder(orderId);
+      const res = type === "accept" ? await acceptOrder(id) : await rejectOrder(id);
       if (!res.success) {
         alert(res.error);
       }
     } finally {
       setLoadingId(null);
+      setDialogAction(null);
     }
   };
 
@@ -117,6 +127,34 @@ export function OrdersClient({ orders }: { orders: any[] }) {
           {renderOrderList(rechazadas, false)}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {dialogAction?.type === "accept" ? "Aceptar Orden" : "Rechazar Orden"}
+            </DialogTitle>
+            <DialogDescription className="pt-2">
+              {dialogAction?.type === "accept" 
+                ? "¿Estás seguro de que deseas aceptar esta orden? Esto descontará automáticamente el stock de los productos."
+                : "¿Estás seguro de que deseas rechazar esta orden? El stock de los productos no se verá afectado."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-end mt-4">
+            <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              type="button" 
+              variant={dialogAction?.type === "accept" ? "default" : "destructive"} 
+              className={dialogAction?.type === "accept" ? "bg-green-600 hover:bg-green-700" : ""}
+              onClick={confirmAction}
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

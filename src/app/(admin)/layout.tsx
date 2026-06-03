@@ -1,8 +1,13 @@
-import Link from "next/link";
-import { LayoutDashboard, Settings, Package, LogOut, ShoppingCart, BarChart3 } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { logout } from "@/app/actions/auth";
+import { SidebarNav } from "./SidebarNav";
+import { db } from "@/lib/db";
+import { orders } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pendingOrders = await db.select({ id: orders.id }).from(orders).where(eq(orders.status, "pending"));
+  const pendingCount = pendingOrders.length;
   return (
     <div className="flex min-h-screen bg-muted/40">
       {/* Sidebar */}
@@ -10,24 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-6 border-b">
           <h2 className="text-xl font-bold text-primary">Charmarket Admin</h2>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
-          <Link href="/admin" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
-            <Settings size={20} />
-            Configuración Dólar
-          </Link>
-          <Link href="/admin/products" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
-            <Package size={20} />
-            Inventario
-          </Link>
-          <Link href="/admin/orders" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
-            <ShoppingCart size={20} />
-            Órdenes
-          </Link>
-          <Link href="/admin/stats" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
-            <BarChart3 size={20} />
-            Estadísticas
-          </Link>
-        </nav>
+        <SidebarNav pendingOrdersCount={pendingCount} />
         
         <div className="p-4 border-t border-border/50">
           <form action={logout}>

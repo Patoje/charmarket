@@ -40,6 +40,9 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
       return;
     }
 
+    // Abrimos la pestaña NUEVA inmediatamente para que el navegador no lo bloquee por el "await"
+    const newWindow = window.open("about:blank", "_blank");
+
     setIsSubmitting(true);
 
     try {
@@ -57,6 +60,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
       const res = await createCheckoutOrder(customerName, totalUsd, orderItems);
 
       if (!res.success) {
+        if (newWindow) newWindow.close();
         alert(res.error || "Error al procesar el pedido.");
         setIsSubmitting(false);
         return;
@@ -75,12 +79,19 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
       message += `\n*Total ARS:* $${Math.round(totalArs).toLocaleString("es-AR")}`;
       
       const encodedMessage = encodeURIComponent(message);
-      window.location.href = `https://wa.me/5493513486735?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/5493513486735?text=${encodedMessage}`;
+      
+      if (newWindow) {
+        newWindow.location.href = whatsappUrl;
+      } else {
+        window.location.href = whatsappUrl;
+      }
       
       clearCart();
       setIsCartOpen(false);
       setCustomerName("");
     } catch (error) {
+      if (newWindow) newWindow.close();
       console.error(error);
       alert("Hubo un error al crear tu pedido. Intenta de nuevo.");
     } finally {
