@@ -84,7 +84,7 @@ export function ProductForm({
         
         <div className="space-y-2 col-span-2">
           <Label>Tipo de Producto</Label>
-          <Select required onValueChange={setCategoryName} value={categoryName}>
+          <Select required onValueChange={(val) => setCategoryName(val || "")} value={categoryName}>
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar tipo..." />
             </SelectTrigger>
@@ -101,7 +101,7 @@ export function ProductForm({
         {categoryName === "ETB" && (
           <div className="space-y-2 col-span-2">
             <Label>Era de la ETB</Label>
-            <Select required onValueChange={setSelectedSubcategory} value={selectedSubcategory}>
+            <Select required onValueChange={(val) => setSelectedSubcategory(val || "")} value={selectedSubcategory}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona Era..." />
               </SelectTrigger>
@@ -175,7 +175,7 @@ export function ProductForm({
 
         <div className="space-y-2">
           <Label>Idioma</Label>
-          <Select required value={language} onValueChange={setLanguage}>
+          <Select required value={language} onValueChange={(val) => setLanguage(val || "")}>
             <SelectTrigger>
               <SelectValue placeholder="Idioma..." />
             </SelectTrigger>

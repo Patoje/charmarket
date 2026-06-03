@@ -139,7 +139,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             />
           </div>
 
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val || "")}>
             <SelectTrigger className="w-full md:w-[240px] bg-background/50 border-border">
               <SelectValue placeholder="Categoría" />
             </SelectTrigger>
@@ -151,7 +151,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             </SelectContent>
           </Select>
 
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={sortBy} onValueChange={(val) => setSortBy(val || "")}>
             <SelectTrigger className="w-full md:w-[240px] bg-background/50 border-border">
               <SelectValue>{sortLabels[sortBy]}</SelectValue>
             </SelectTrigger>
@@ -182,7 +182,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">Idioma</Label>
-              <Select value={languageFilter} onValueChange={setLanguageFilter}>
+              <Select value={languageFilter} onValueChange={(val) => setLanguageFilter(val || "")}>
                 <SelectTrigger className="w-full bg-background/50 border-border">
                   <SelectValue placeholder="Cualquier Idioma" />
                 </SelectTrigger>
