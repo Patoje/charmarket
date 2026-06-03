@@ -26,7 +26,7 @@ export default async function ShopPage() {
       {/* Hero Section */}
       <main className="flex-1 container mx-auto px-4 py-20 relative">
         
-        <div className="max-w-2xl">
+        <div className="max-w-2xl relative z-10">
           <div className="flex items-center gap-4 mb-6">
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
             <span className="text-[0.72rem] uppercase tracking-[0.18em] text-primary font-bold">Tu tienda de confianza</span>
@@ -41,6 +41,15 @@ export default async function ShopPage() {
           <p className="text-muted-foreground text-lg mb-10 max-w-md leading-relaxed">
             Cartas Pokémon TCG singles, sobres y colecciones especiales. Encontrá las más buscadas del formato y las joyas de cada expansión.
           </p>
+        </div>
+
+        {/* Charmander Decorativo */}
+        <div className="absolute top-1/2 -translate-y-1/2 -right-12 md:-right-20 opacity-65 pointer-events-none z-0">
+          <img 
+            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" 
+            alt="Charmander Decorativo"
+            className="h-[280px] w-auto object-contain drop-shadow-2xl"
+          />
         </div>
 
 

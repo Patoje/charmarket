@@ -273,7 +273,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             >
               {/* Imagen / Emoji Section */}
               <div 
-                className="relative h-56 w-full flex items-center justify-center p-6 bg-gradient-to-b from-transparent to-black/20 cursor-pointer"
+                className="relative h-56 w-full flex items-center justify-center p-4 bg-[#2e1208] rounded-t-xl cursor-pointer"
                 onClick={() => setSelectedProduct(product)}
               >
                 <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
@@ -296,7 +296,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   <img 
                     src={product.imageUrl} 
                     alt={product.name}
-                    className="w-full h-full object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full max-h-[160px] object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
                   <span className="text-7xl drop-shadow-2xl group-hover:scale-110 transition-transform duration-300">
@@ -386,12 +386,14 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto mb-6 pr-2">
-                  <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
-                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                    {selectedProduct.description || "No hay detalles adicionales para este producto."}
-                  </p>
-                </div>
+                {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
+                  <div className="flex-1 overflow-y-auto mb-6 pr-2">
+                    <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
+                    <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                      {selectedProduct.description}
+                    </p>
+                  </div>
+                )}
 
                 <div className="mt-auto border-t border-border/50 pt-6">
                   <div className="flex justify-between items-end mb-6">
