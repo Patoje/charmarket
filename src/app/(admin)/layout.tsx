@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, Settings, Package, LogOut } from "lucide-react";
+import { LayoutDashboard, Settings, Package, LogOut, ShoppingCart, BarChart3 } from "lucide-react";
 import { logout } from "@/app/actions/auth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -12,12 +12,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <Link href="/admin" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
-            <LayoutDashboard size={20} />
+            <Settings size={20} />
             Configuración Dólar
           </Link>
           <Link href="/admin/products" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
             <Package size={20} />
             Inventario
+          </Link>
+          <Link href="/admin/orders" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
+            <ShoppingCart size={20} />
+            Órdenes
+          </Link>
+          <Link href="/admin/stats" className="flex items-center gap-3 p-3 hover:bg-accent rounded-md transition-colors text-sm font-medium">
+            <BarChart3 size={20} />
+            Estadísticas
           </Link>
         </nav>
         
