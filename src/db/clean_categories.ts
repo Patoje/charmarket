@@ -1,13 +1,13 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import { products, categories } from "./schema";
 import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
 const connectionString = process.env.DATABASE_URL!;
-const client = postgres(connectionString);
-const db = drizzle(client);
+const sqlConnection = neon(process.env.DATABASE_URL!);
+const db = drizzle(sqlConnection);
 
 const categoryNames = [
   "Accesorios",
