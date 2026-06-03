@@ -1,0 +1,432 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ShoppingCart, Filter, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { useCart } from "@/components/CartContext";
+import { CartDrawer } from "./CartDrawer";
+
+export function CatalogClient({ products, categories, dolarValue }: { products: any[], categories: any[], dolarValue: number }) {
+  const { addItem, items } = useCart();
+
+  // Estados de Filtros
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("Todas");
+  const [sortBy, setSortBy] = useState("none");
+  
+  // Filtros Avanzados
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [languageFilter, setLanguageFilter] = useState("Todos");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [priceCurrency, setPriceCurrency] = useState<"USD" | "ARS">("USD");
+
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [addedFeedback, setAddedFeedback] = useState(false);
+  const [addedGridFeedback, setAddedGridFeedback] = useState<Record<number, boolean>>({});
+
+  const uniqueLanguages = useMemo(() => Array.from(new Set(products.map(p => p.language))), [products]);
+
+  // Mapa de nombres de ordenamiento para asegurar que siempre diga lo correcto
+  const sortLabels: Record<string, string> = {
+    none: "Por Defecto",
+    price_asc: "Precio: Menor a Mayor",
+    price_desc: "Precio: Mayor a Menor",
+    name_asc: "Nombre: A - Z",
+    name_desc: "Nombre: Z - A"
+  };
+
+  // Lógica principal de filtrado y ordenamiento
+  const filteredAndSortedProducts = useMemo(() => {
+    let result = [...products];
+
+    // 1. Filtro por Búsqueda (Nombre)
+    if (searchTerm) {
+      result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+
+    // 2. Filtro por Categoría
+    if (categoryFilter !== "Todas") {
+      result = result.filter(p => p.categoryName === categoryFilter);
+    }
+
+    // 3. Filtro por Idioma (Avanzado)
+    if (languageFilter !== "Todos") {
+      result = result.filter(p => p.language === languageFilter);
+    }
+
+    // 4. Filtro por Precio (Avanzado)
+    if (priceMin || priceMax) {
+      const min = priceMin ? parseFloat(priceMin) : 0;
+      const max = priceMax ? parseFloat(priceMax) : Infinity;
+
+      result = result.filter(p => {
+        let targetPrice = Number(p.priceUsdMinorista);
+        if (priceCurrency === "ARS") {
+          targetPrice = Math.round(targetPrice * dolarValue);
+        }
+        return targetPrice >= min && targetPrice <= max;
+      });
+    }
+
+    // 5. Ordenamiento
+    if (sortBy !== "none") {
+      result.sort((a, b) => {
+        switch (sortBy) {
+          case "price_asc":
+            return Number(a.priceUsdMinorista) - Number(b.priceUsdMinorista);
+          case "price_desc":
+            return Number(b.priceUsdMinorista) - Number(a.priceUsdMinorista);
+          case "name_asc":
+            return a.name.localeCompare(b.name);
+          case "name_desc":
+            return b.name.localeCompare(a.name);
+          default:
+            return 0;
+        }
+      });
+    }
+
+    // 6. REGLA DE ORO: Sin stock siempre al final
+    result.sort((a, b) => {
+      const aHasStock = a.stock > 0;
+      const bHasStock = b.stock > 0;
+      if (aHasStock && !bHasStock) return -1;
+      if (!aHasStock && bHasStock) return 1;
+      return 0; // Si ambos tienen o no tienen stock, mantienen el orden previo
+    });
+
+    return result;
+  }, [products, searchTerm, categoryFilter, languageFilter, priceMin, priceMax, priceCurrency, sortBy, dolarValue]);
+
+
+  // Función simple para generar un emoji representativo si no hay imagen
+  const getProductEmoji = (name: string, category: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes("pikachu") || lowerName.includes("rayo")) return "⚡";
+    if (lowerName.includes("charizard") || lowerName.includes("fuego")) return "🐉";
+    if (lowerName.includes("umbreon") || lowerName.includes("luna")) return "🌙";
+    if (lowerName.includes("agua") || lowerName.includes("greninja")) return "🌊";
+    if (lowerName.includes("sceptile") || lowerName.includes("planta")) return "🌿";
+    if (category.includes("Booster") || category.includes("Sobre")) return "💎";
+    if (category.includes("ETB")) return "📦";
+    return "🃏";
+  };
+
+  return (
+    <div className="pb-24">
+      {/* BARRA DE FILTROS */}
+      <div className="bg-card border border-border/50 rounded-xl p-6 mb-8 mt-4 shadow-sm">
+        
+        {/* Filtros Principales */}
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          
+          <div className="relative flex-1 w-full flex items-center">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <Input 
+              placeholder="Buscar carta o producto..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-background/50 border-border w-full"
+            />
+          </div>
+
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-full md:w-[240px] bg-background/50 border-border">
+              <SelectValue placeholder="Categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Todas">Todas las categorías</SelectItem>
+              {categories.map((cat: any) => (
+                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full md:w-[240px] bg-background/50 border-border">
+              <SelectValue>{sortLabels[sortBy]}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(sortLabels).map(([key, label]) => (
+                <SelectItem key={key} value={key}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Botón para mostrar/ocultar Filtros Avanzados */}
+        <div className="mt-4 flex items-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="text-xs uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors p-0 h-auto"
+          >
+            <Filter className="mr-2 h-3 w-3" />
+            Filtros Avanzados
+            {showAdvanced ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+          </Button>
+        </div>
+
+        {/* Filtros Avanzados Colapsables */}
+        {showAdvanced && (
+          <div className="mt-6 pt-6 border-t border-border/50 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 fade-in duration-200">
+            
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Idioma</Label>
+              <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                <SelectTrigger className="w-full bg-background/50 border-border">
+                  <SelectValue placeholder="Cualquier Idioma" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Todos">Cualquier Idioma</SelectItem>
+                  {uniqueLanguages.map(lang => (
+                    <SelectItem key={lang} value={lang}>{lang}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Rango de Precio</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <Select value={priceCurrency} onValueChange={(val: any) => {
+                  setPriceCurrency(val);
+                  setPriceMin("");
+                  setPriceMax("");
+                }}>
+                  <SelectTrigger className="w-[100px] bg-background/50 border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="ARS">ARS</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Input 
+                  type="number" 
+                  placeholder="Mínimo" 
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(e.target.value)}
+                  className="w-24 bg-background/50 border-border"
+                />
+                <span className="text-muted-foreground">-</span>
+                <Input 
+                  type="number" 
+                  placeholder="Máximo" 
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(e.target.value)}
+                  className="w-24 bg-background/50 border-border"
+                />
+                
+                {(priceMin || priceMax || languageFilter !== "Todos") && (
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => {
+                      setPriceMin("");
+                      setPriceMax("");
+                      setLanguageFilter("Todos");
+                    }}
+                    className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive ml-auto"
+                  >
+                    Limpiar Avanzados
+                  </Button>
+                )}
+              </div>
+            </div>
+
+          </div>
+        )}
+      </div>
+
+      {/* GRILLA DE RESULTADOS */}
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-[0.7rem] uppercase tracking-widest text-muted-foreground">
+          Mostrando {filteredAndSortedProducts.length} productos
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {filteredAndSortedProducts.map((product) => {
+          const cartItem = items.find(i => i.product.id === product.id);
+          const currentQtyInCart = cartItem?.quantity || 0;
+          const availableToAdd = product.stock - currentQtyInCart;
+
+          const arsPrice = Math.round(product.priceUsdMinorista * dolarValue);
+          const isOutOfStock = product.stock <= 0;
+
+          return (
+            <div 
+              key={product.id} 
+              className={`group flex flex-col bg-card border border-border rounded-xl overflow-hidden transition-all duration-300 shadow-sm ${
+                isOutOfStock ? "opacity-60 grayscale hover:grayscale-0" : "hover:-translate-y-1 hover:border-primary/60"
+              }`}
+            >
+              {/* Imagen / Emoji Section */}
+              <div 
+                className="relative h-56 w-full flex items-center justify-center p-6 bg-gradient-to-b from-transparent to-black/20 cursor-pointer"
+                onClick={() => setSelectedProduct(product)}
+              >
+                <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
+                  {isOutOfStock ? (
+                    <span className="bg-muted text-muted-foreground border border-border/50 text-[10px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
+                      Agotado
+                    </span>
+                  ) : (
+                    <>
+                      {product.stock < 5 && product.stock > 0 && (
+                        <span className="bg-destructive/80 text-white text-[10px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
+                          Últimos
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+                
+                {product.imageUrl ? (
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name}
+                    className="w-full h-full object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <span className="text-7xl drop-shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                    {getProductEmoji(product.name, product.categoryName)}
+                  </span>
+                )}
+              </div>
+
+              {/* Contenido */}
+              <div className="p-5 flex-1 flex flex-col border-t border-border/50">
+                <h3 className="font-heading font-bold text-lg tracking-wide mb-1 uppercase line-clamp-1">
+                  {product.name}
+                </h3>
+                <p className="text-muted-foreground text-xs mb-4 uppercase tracking-wider line-clamp-1">
+                  {product.categoryName} • {product.language}
+                </p>
+
+                <div className="mt-auto flex items-end justify-between">
+                  <div className={isOutOfStock ? "opacity-50" : ""}>
+                    <p className="text-xl font-bold text-primary">USD {Number(product.priceUsdMinorista).toFixed(2)}</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider mt-0.5 font-medium">ARS ${arsPrice.toLocaleString("es-AR")}</p>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    className={`text-xs tracking-widest uppercase rounded-md h-10 px-4 transition-all duration-300 active:scale-95 ${
+                      isOutOfStock 
+                        ? "bg-muted/50 border-border text-muted-foreground cursor-not-allowed" 
+                        : addedGridFeedback[product.id]
+                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700"
+                        : "bg-transparent border-primary/30 text-foreground hover:bg-transparent hover:border-primary hover:text-primary"
+                    }`}
+                    disabled={availableToAdd <= 0}
+                    onClick={() => {
+                      addItem(product);
+                      setAddedGridFeedback(prev => ({ ...prev, [product.id]: true }));
+                      setTimeout(() => {
+                        setAddedGridFeedback(prev => ({ ...prev, [product.id]: false }));
+                      }, 1500);
+                    }}
+                  >
+                    {addedGridFeedback[product.id] ? "¡Añadido!" : isOutOfStock ? "Sin Stock" : availableToAdd <= 0 ? "Límite" : "+ Agregar"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {filteredAndSortedProducts.length === 0 && (
+          <div className="col-span-full text-center py-20 text-muted-foreground border border-dashed border-border/50 rounded-xl bg-card/30">
+            <Search className="h-10 w-10 mx-auto mb-4 opacity-20" />
+            <p className="font-heading text-xl uppercase tracking-wide">No hay resultados</p>
+            <p className="text-sm mt-2">Intenta ajustar los filtros o el término de búsqueda.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Modal de Detalle de Producto */}
+      <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
+        <DialogContent className="max-w-3xl bg-background border-border/50 shadow-2xl p-0 overflow-hidden sm:max-w-4xl">
+          {selectedProduct && (
+            <div className="flex flex-col md:flex-row h-full max-h-[85vh]">
+              {/* Lado izquierdo: Imagen grande */}
+              <div className="md:w-1/2 bg-black flex items-center justify-center p-8 md:p-12 border-b md:border-b-0 md:border-r border-border/50 min-h-[300px]">
+                {selectedProduct.imageUrl ? (
+                  <img 
+                    src={selectedProduct.imageUrl} 
+                    alt={selectedProduct.name}
+                    className="w-full h-full max-h-[500px] object-contain drop-shadow-2xl"
+                  />
+                ) : (
+                  <span className="text-9xl drop-shadow-2xl">
+                    {getProductEmoji(selectedProduct.name, selectedProduct.categoryName)}
+                  </span>
+                )}
+              </div>
+              
+              {/* Lado derecho: Detalles e Info */}
+              <div className="md:w-1/2 p-6 md:p-8 flex flex-col relative bg-background">
+                <DialogHeader className="mb-4 text-left">
+                  <Badge variant="secondary" className="w-fit mb-3 text-xs uppercase tracking-widest">{selectedProduct.categoryName}</Badge>
+                  <DialogTitle className="font-heading font-bold text-3xl uppercase tracking-wide leading-tight mb-2">
+                    {selectedProduct.name}
+                  </DialogTitle>
+                  <DialogDescription className="uppercase tracking-widest text-xs font-medium text-muted-foreground">
+                    Idioma: {selectedProduct.language}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="flex-1 overflow-y-auto mb-6 pr-2">
+                  <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
+                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                    {selectedProduct.description || "No hay detalles adicionales para este producto."}
+                  </p>
+                </div>
+
+                <div className="mt-auto border-t border-border/50 pt-6">
+                  <div className="flex justify-between items-end mb-6">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Precio</p>
+                      <p className="text-4xl font-bold text-primary">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Disponibles</p>
+                      <p className={`text-2xl font-bold ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
+                        {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button 
+                    className={`w-full h-14 uppercase tracking-widest font-bold text-sm active:scale-95 transition-all duration-300 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white" : ""}`} 
+                    disabled={selectedProduct.stock - (items.find((i: any) => i.product.id === selectedProduct.id)?.quantity || 0) <= 0}
+                    onClick={() => {
+                      addItem(selectedProduct);
+                      setAddedFeedback(true);
+                      setTimeout(() => setAddedFeedback(false), 1500);
+                    }}
+                  >
+                    {addedFeedback ? "¡Añadido al Carrito!" : selectedProduct.stock <= 0 ? "Agotado" : "Añadir al Carrito"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <CartDrawer dolarValue={dolarValue} />
+    </div>
+  );
+}
