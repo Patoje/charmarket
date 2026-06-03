@@ -23,7 +23,7 @@ export default async function ShopPage() {
         </div>
 
         {/* Charmander Decorativo */}
-        <div className="absolute top-1/2 -translate-y-1/2 -mt-2 right-0 pr-4 opacity-80 pointer-events-none z-[-1]">
+        <div className="absolute top-1/2 -translate-y-1/2 -mt-5 right-0 pr-4 opacity-80 pointer-events-none z-[-1]">
           <img 
             src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" 
             alt="Charmander Decorativo"
