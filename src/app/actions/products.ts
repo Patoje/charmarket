@@ -97,3 +97,47 @@ export async function updateProductStock(id: number, newStock: number) {
     return { error: "Error al actualizar el stock" };
   }
 }
+
+export async function importProductsFromCSV(parsedRows: any[]) {
+  try {
+    // 1. Obtener la primera categoría disponible por defecto
+    const allCats = await db.select().from(categories).limit(1);
+    if (allCats.length === 0) {
+      return { error: "No hay categorías creadas en la base de datos. Crea una categoría primero." };
+    }
+    const defaultCategoryId = allCats[0].id;
+
+    // 2. Mapear las filas a objetos de inserción
+    const valuesToInsert = parsedRows.map((row) => {
+      // Parsear precios y stock. Si vienen vacíos o inválidos, se ponen en 0
+      const minorista = parseFloat(row["minorista USD"]) || 0;
+      const mayorista = parseFloat(row["Mayorista USD"]) || 0;
+      const stock = parseInt(row["Stock"]) || 0;
+
+      return {
+        name: String(row["Nombre producto"] || "Producto sin nombre"),
+        description: "",
+        imageUrl: null, // Dejamos la imagen vacía para que la agreguen luego
+        categoryId: defaultCategoryId,
+        language: "Español", // Default, ya que el CSV no lo tiene
+        priceUsdMinorista: minorista.toString(),
+        priceUsdMayorista: mayorista.toString(),
+        stock: stock,
+        isActive: true,
+      };
+    });
+
+    // 3. Insertar todo de forma masiva (Bulk Insert)
+    if (valuesToInsert.length > 0) {
+      await db.insert(products).values(valuesToInsert);
+    }
+
+    revalidatePath("/admin/products");
+    revalidatePath("/");
+    
+    return { success: true, count: valuesToInsert.length };
+  } catch (error) {
+    console.error("Error importando CSV:", error);
+    return { error: "Hubo un error al importar los datos a la base de datos." };
+  }
+}

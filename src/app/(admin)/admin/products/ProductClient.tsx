@@ -1,18 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Papa from "papaparse";
 import { Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { deleteProduct, updateProductStock } from "@/app/actions/products";
+import { deleteProduct, updateProductStock, importProductsFromCSV } from "@/app/actions/products";
 import { ProductForm } from "./ProductForm";
 
 export function ProductClient({ products, categories }: { products: any[], categories: any[] }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const handleDelete = async (id: number) => {
@@ -43,6 +46,38 @@ export function ProductClient({ products, categories }: { products: any[], categ
     setIsDialogOpen(false);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        try {
+          const res = await importProductsFromCSV(results.data);
+          if (res.success) {
+            alert(`¡Éxito! Se importaron ${res.count} productos correctamente.`);
+          } else {
+            alert(res.error || "Ocurrió un error en la importación.");
+          }
+        } catch (error) {
+          alert("Ocurrió un error inesperado al procesar el archivo.");
+        } finally {
+          setIsImporting(false);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Limpiar input
+          }
+        }
+      },
+      error: () => {
+        alert("Error leyendo el archivo CSV. Asegúrate de que el formato sea correcto.");
+        setIsImporting(false);
+      }
+    });
+  };
+
   return (
     <div className="space-y-4 mt-4">
       <div className="flex justify-between items-center">
@@ -50,7 +85,25 @@ export function ProductClient({ products, categories }: { products: any[], categ
           <h2 className="text-3xl font-heading font-bold tracking-tight text-primary uppercase">INVENTARIO</h2>
           <p className="text-muted-foreground mt-2">Gestiona el catálogo de productos de TCG.</p>
         </div>
-        <Button onClick={openNewProductDialog}><Plus className="mr-2 h-4 w-4" /> Agregar Producto</Button>
+        <div className="flex gap-2">
+          <input 
+            type="file" 
+            accept=".csv" 
+            className="hidden" 
+            ref={fileInputRef} 
+            onChange={handleFileUpload} 
+          />
+          <Button 
+            variant="outline" 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isImporting}
+          >
+            {isImporting ? "Importando..." : "Importar CSV"}
+          </Button>
+          <Button onClick={openNewProductDialog}>
+            <Plus className="mr-2 h-4 w-4" /> Agregar Producto
+          </Button>
+        </div>
       </div>
 
       <div className="border rounded-md bg-card">
