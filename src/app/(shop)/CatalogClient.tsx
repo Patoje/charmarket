@@ -41,7 +41,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
     } else if (languageFilter === "Inglés") {
       return ["Moderna", "Vintage"];
     } else if (languageFilter === "Cualquier Idioma") {
-      if (categoryFilter === "Todas las categorías" || categoryFilter === "Booster Box") {
+      if (categoryFilter === "Todas las categorías" || categoryFilter === "Booster Box" || categoryFilter === "Booster Pack") {
         return ["Moderna", "Vintage", "Común", "Especial"];
       } else if (categoryFilter === "ETB") {
         return ["Moderna", "Vintage"];

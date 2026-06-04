@@ -61,7 +61,7 @@ export function ProductForm({
     let options: string[] = [];
     if (categoryName === "ETB") {
       options = ["Moderna", "Vintage"];
-    } else if (categoryName === "Booster Box") {
+    } else if (categoryName === "Booster Box" || categoryName === "Booster Pack") {
       options = language === "Japonés" ? ["Común", "Especial"] : ["Moderna", "Vintage"];
     }
     if (selectedSubcategory && !options.includes(selectedSubcategory)) {
@@ -70,12 +70,33 @@ export function ProductForm({
   }, [categoryName, language]);
 
   const handleSubmit = (formData: FormData) => {
-    // Combinar el nombre con el nombre en inglés antes de enviar si corresponde
+    let finalName = productName.trim();
     if (language === "Japonés" && englishName.trim() !== "") {
-      formData.set("name", `${productName.trim()} (${englishName.trim()})`);
-    } else {
-      formData.set("name", productName.trim());
+      finalName = `${finalName} (${englishName.trim()})`;
     }
+
+    // Auto-prefijar la categoría para mantener consistencia en la DB
+    if (categoryName && finalName) {
+      const upperFinal = finalName.toUpperCase();
+      const upperCat = categoryName.toUpperCase();
+      
+      let shouldPrepend = true;
+      if (upperFinal.startsWith(upperCat)) {
+        shouldPrepend = false;
+      } else if (categoryName === "Collection Box" && upperFinal.includes("BOX")) {
+        shouldPrepend = false;
+      } else if (categoryName === "ETB" && upperFinal.includes("ETB")) {
+        shouldPrepend = false;
+      } else if (categoryName === "Accesorios") {
+        shouldPrepend = false;
+      }
+
+      if (shouldPrepend) {
+        finalName = `${categoryName} ${finalName}`;
+      }
+    }
+
+    formData.set("name", finalName);
 
     startTransition(async () => {
       setError(null);
@@ -93,7 +114,7 @@ export function ProductForm({
       {initialData?.id && <input type="hidden" name="productId" value={initialData.id} />}
       <input type="hidden" name="categoryId" value={selectedCategoryId} />
       <input type="hidden" name="language" value={language} />
-      {["ETB", "Booster Box"].includes(categoryName) && selectedSubcategory && (
+      {["ETB", "Booster Box", "Booster Pack"].includes(categoryName) && selectedSubcategory && (
         <input type="hidden" name="subCategory" value={selectedSubcategory} />
       )}
       <div className="grid grid-cols-2 gap-4">
@@ -114,11 +135,11 @@ export function ProductForm({
           </Select>
         </div>
 
-        {["ETB", "Booster Box"].includes(categoryName) && (() => {
+        {["ETB", "Booster Box", "Booster Pack"].includes(categoryName) && (() => {
           let options: string[] = [];
           if (categoryName === "ETB") {
             options = ["Moderna", "Vintage"];
-          } else { // Booster Box
+          } else { // Booster Box o Booster Pack
             if (language === "Japonés") {
               options = ["Común", "Especial"];
             } else {
