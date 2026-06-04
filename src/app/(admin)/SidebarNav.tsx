@@ -12,7 +12,6 @@ export function SidebarNav({ pendingOrdersCount }: { pendingOrdersCount: number 
     { href: "/admin", label: "Configuración Dólar", icon: Settings },
     { href: "/admin/products", label: "Inventario", icon: Package },
     { href: "/admin/orders", label: "Órdenes", icon: ShoppingCart },
-    { href: "/admin/stats", label: "Estadísticas", icon: BarChart3 },
   ];
 
   return (

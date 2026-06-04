@@ -26,6 +26,21 @@ export function ProductForm({
   const [language, setLanguage] = useState<string>(initialData?.language || "Inglés");
   const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || "");
 
+  // Para extraer el nombre en inglés si ya estaba guardado con paréntesis (ej: Shiny Treasure (Paldean Fates))
+  const initName = initialData?.name || "";
+  let defaultName = initName;
+  let defaultEnglishName = "";
+  if (initialData?.language === "Japonés" && initName.endsWith(")")) {
+    const match = initName.match(/(.*) \((.*)\)$/);
+    if (match) {
+      defaultName = match[1].trim();
+      defaultEnglishName = match[2].trim();
+    }
+  }
+
+  const [productName, setProductName] = useState(defaultName);
+  const [englishName, setEnglishName] = useState(defaultEnglishName);
+
   const selectedCategoryId = categories.find(c => c.name === categoryName)?.id || "";
 
   // Lógica inteligente de idiomas según la categoría elegida
@@ -55,6 +70,13 @@ export function ProductForm({
   }, [categoryName, language]);
 
   const handleSubmit = (formData: FormData) => {
+    // Combinar el nombre con el nombre en inglés antes de enviar si corresponde
+    if (language === "Japonés" && englishName.trim() !== "") {
+      formData.set("name", `${productName.trim()} (${englishName.trim()})`);
+    } else {
+      formData.set("name", productName.trim());
+    }
+
     startTransition(async () => {
       setError(null);
       const result = await saveProduct(formData);
@@ -119,10 +141,19 @@ export function ProductForm({
           );
         })()}
 
-        <div className="space-y-2 col-span-2">
+        <div className="space-y-2 col-span-2 md:col-span-1">
           <Label htmlFor="name">Nombre Específico</Label>
-          <Input id="name" name="name" required placeholder="Ej: 151, Paldean Fates..." defaultValue={initialData?.name || ""} />
+          <Input id="name" name="name" required placeholder="Ej: Shiny Treasure..." value={productName} onChange={(e) => setProductName(e.target.value)} />
         </div>
+
+        {language === "Japonés" ? (
+          <div className="space-y-2 col-span-2 md:col-span-1">
+            <Label htmlFor="englishName">Nombre en Inglés (Opcional)</Label>
+            <Input id="englishName" placeholder="Ej: Paldean Fates..." value={englishName} onChange={(e) => setEnglishName(e.target.value)} />
+          </div>
+        ) : (
+          <div className="col-span-2 md:col-span-1 hidden md:block"></div>
+        )}
         
         <div className="space-y-2 col-span-2">
           <Label htmlFor="description">Descripción (Opcional)</Label>

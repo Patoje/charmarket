@@ -48,7 +48,7 @@ export default async function ShopPage() {
           </h1>
 
           <p className="text-muted-foreground text-lg mb-10 max-w-md leading-relaxed">
-            Cartas Pokémon TCG singles, sobres y colecciones especiales. Encontrá las más buscadas del formato y las joyas de cada expansión.
+            Cartas Pokémon TCG, sobres y colecciones especiales. Encontrá las más buscadas del formato y las joyas de cada expansión.
           </p>
         </div>
 

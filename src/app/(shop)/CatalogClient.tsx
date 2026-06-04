@@ -23,7 +23,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   
   // Filtros Avanzados
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [languageFilter, setLanguageFilter] = useState("Todos");
+  const [languageFilter, setLanguageFilter] = useState("Cualquier Idioma");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [priceCurrency, setPriceCurrency] = useState<"USD" | "ARS">("USD");
@@ -36,12 +36,19 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   const uniqueLanguages = useMemo(() => Array.from(new Set(products.map(p => p.language))), [products]);
 
   const availableSubCategories = useMemo(() => {
-    const productsInCat = categoryFilter === "Todas las categorías" 
-      ? products 
-      : products.filter(p => p.categoryName === categoryFilter);
-    const subs = Array.from(new Set(productsInCat.map(p => p.subCategory).filter(Boolean)));
-    return subs as string[];
-  }, [categoryFilter, products]);
+    if (languageFilter === "Japonés") {
+      return ["Común", "Especial"];
+    } else if (languageFilter === "Inglés") {
+      return ["Moderna", "Vintage"];
+    } else if (languageFilter === "Cualquier Idioma") {
+      if (categoryFilter === "Todas las categorías" || categoryFilter === "Booster Box") {
+        return ["Moderna", "Vintage", "Común", "Especial"];
+      } else if (categoryFilter === "ETB") {
+        return ["Moderna", "Vintage"];
+      }
+    }
+    return [];
+  }, [categoryFilter, languageFilter]);
 
   // Mapa de nombres de ordenamiento para asegurar que siempre diga lo correcto
   const sortLabels: Record<string, string> = {
@@ -72,7 +79,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
     }
 
     // 3. Filtro por Idioma (Avanzado)
-    if (languageFilter !== "Todos") {
+    if (languageFilter !== "Cualquier Idioma") {
       result = result.filter(p => p.language === languageFilter);
     }
 
@@ -212,7 +219,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   <SelectValue placeholder="Cualquier Idioma" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Todos">Cualquier Idioma</SelectItem>
+                  <SelectItem value="Cualquier Idioma">Cualquier Idioma</SelectItem>
                   {uniqueLanguages.map(lang => (
                     <SelectItem key={lang} value={lang}>{lang}</SelectItem>
                   ))}
@@ -294,18 +301,19 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   className="w-24 bg-background/50 border-border"
                 />
                 
-                {(priceMin || priceMax || languageFilter !== "Todos" || hideOutOfStock) && (
+                {(priceMin || priceMax || languageFilter !== "Cualquier Idioma" || subCategoryFilter !== "Todas las subcategorías" || hideOutOfStock) && (
                   <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     onClick={() => {
                       setPriceMin("");
                       setPriceMax("");
-                      setLanguageFilter("Todos");
+                      setLanguageFilter("Cualquier Idioma");
+                      setSubCategoryFilter("Todas las subcategorías");
                       setHideOutOfStock(false);
                     }}
-                    className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive ml-auto"
+                    className="text-xs border-destructive text-destructive hover:bg-destructive hover:text-white ml-auto"
                   >
-                    Limpiar Avanzados
+                    Limpiar Filtros
                   </Button>
                 )}
               </div>
