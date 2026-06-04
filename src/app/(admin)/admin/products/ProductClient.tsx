@@ -52,11 +52,11 @@ export function ProductClient({ products, categories }: { products: any[], categ
 
     setIsImporting(true);
     Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
+      header: false, // No usamos header fijo porque el Excel tiene secciones y títulos intermedios
+      skipEmptyLines: 'greedy',
       complete: async (results) => {
         try {
-          const res = await importProductsFromCSV(results.data);
+          const res = await importProductsFromCSV(results.data as string[][]);
           if (res.success) {
             alert(`¡Éxito! Se importaron ${res.count} productos correctamente.`);
           } else {
