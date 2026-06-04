@@ -21,21 +21,8 @@ export function ProductForm({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  // Parsear el nombre si es ETB para extraer la subcategoría
-  let parsedName = initialData?.name || "";
-  let parsedSub = "";
-  if (initialData?.categoryName === "ETB") {
-    if (parsedName.startsWith("ETB Moderno - ")) {
-      parsedSub = "Moderno";
-      parsedName = parsedName.replace("ETB Moderno - ", "");
-    } else if (parsedName.startsWith("ETB Vintage - ")) {
-      parsedSub = "Vintage";
-      parsedName = parsedName.replace("ETB Vintage - ", "");
-    }
-  }
-
   const [categoryName, setCategoryName] = useState<string>(initialData?.categoryName || "");
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>(parsedSub);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>(initialData?.subCategory || "");
   const [language, setLanguage] = useState<string>(initialData?.language || "Inglés");
   const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || "");
 
@@ -55,16 +42,19 @@ export function ProductForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryName]);
 
-  const handleSubmit = (formData: FormData) => {
-    const baseName = formData.get("name") as string;
-    let finalName = baseName;
-    if (categoryName === "ETB" && selectedSubcategory) {
-      finalName = `ETB ${selectedSubcategory} - ${baseName}`;
+  useEffect(() => {
+    let options: string[] = [];
+    if (categoryName === "ETB") {
+      options = ["Moderna", "Vintage"];
+    } else if (categoryName === "Booster Box") {
+      options = language === "Japonés" ? ["Común", "Especial"] : ["Moderna", "Vintage"];
     }
+    if (selectedSubcategory && !options.includes(selectedSubcategory)) {
+      setSelectedSubcategory("");
+    }
+  }, [categoryName, language]);
 
-    formData.set("name", finalName);
-    formData.set("language", language); 
-
+  const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
       setError(null);
       const result = await saveProduct(formData);
@@ -80,6 +70,10 @@ export function ProductForm({
     <form key={initialData?.id || "new"} action={handleSubmit} className="space-y-4">
       {initialData?.id && <input type="hidden" name="productId" value={initialData.id} />}
       <input type="hidden" name="categoryId" value={selectedCategoryId} />
+      <input type="hidden" name="language" value={language} />
+      {["ETB", "Booster Box"].includes(categoryName) && selectedSubcategory && (
+        <input type="hidden" name="subCategory" value={selectedSubcategory} />
+      )}
       <div className="grid grid-cols-2 gap-4">
         
         <div className="space-y-2 col-span-2">
@@ -98,24 +92,36 @@ export function ProductForm({
           </Select>
         </div>
 
-        {categoryName === "ETB" && (
-          <div className="space-y-2 col-span-2">
-            <Label>Era de la ETB</Label>
-            <Select required onValueChange={(val) => setSelectedSubcategory(val || "")} value={selectedSubcategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona Era..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Moderno">Moderno</SelectItem>
-                <SelectItem value="Vintage">Vintage</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {["ETB", "Booster Box"].includes(categoryName) && (() => {
+          let options: string[] = [];
+          if (categoryName === "ETB") {
+            options = ["Moderna", "Vintage"];
+          } else { // Booster Box
+            if (language === "Japonés") {
+              options = ["Común", "Especial"];
+            } else {
+              options = ["Moderna", "Vintage"];
+            }
+          }
+          
+          return (
+            <div className="space-y-2 col-span-2">
+              <Label>Era / Subcategoría</Label>
+              <Select required onValueChange={(val) => setSelectedSubcategory(val || "")} value={selectedSubcategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona Era..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        })()}
 
         <div className="space-y-2 col-span-2">
           <Label htmlFor="name">Nombre Específico</Label>
-          <Input id="name" name="name" required placeholder="Ej: 151, Paldean Fates..." defaultValue={parsedName} />
+          <Input id="name" name="name" required placeholder="Ej: 151, Paldean Fates..." defaultValue={initialData?.name || ""} />
         </div>
         
         <div className="space-y-2 col-span-2">

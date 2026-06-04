@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, numeric, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric, index, varchar } from "drizzle-orm/pg-core";
 
 export const globalConfigs = pgTable("global_configs", {
   id: serial("id").primaryKey(),
@@ -17,11 +17,12 @@ export const categories = pgTable("categories", {
 
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   imageUrl: text("image_url"),
   categoryId: integer("category_id").references(() => categories.id).notNull(),
-  language: text("language").notNull(),
+  subCategory: varchar("sub_category", { length: 100 }), // Moderna, Vintage, etc.
+  language: varchar("language", { length: 50 }).notNull().default("Español"),
   priceUsdMinorista: numeric("price_usd_minorista", { precision: 10, scale: 2 }).notNull(),
   priceUsdMayorista: numeric("price_usd_mayorista", { precision: 10, scale: 2 }).notNull(),
   stock: integer("stock").notNull().default(0),

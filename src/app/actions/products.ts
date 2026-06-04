@@ -13,6 +13,7 @@ export async function getProducts() {
     imageUrl: products.imageUrl,
     categoryId: products.categoryId,
     categoryName: categories.name,
+    subCategory: products.subCategory,
     language: products.language,
     priceUsdMinorista: products.priceUsdMinorista,
     priceUsdMayorista: products.priceUsdMayorista,
@@ -37,6 +38,7 @@ export async function saveProduct(formData: FormData) {
     const description = formData.get("description") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const categoryId = parseInt(formData.get("categoryId") as string);
+    const subCategory = formData.get("subCategory") as string;
     const language = formData.get("language") as string;
     const priceUsdMinorista = formData.get("priceUsdMinorista") as string;
     const priceUsdMayorista = formData.get("priceUsdMayorista") as string;
@@ -51,6 +53,7 @@ export async function saveProduct(formData: FormData) {
       description,
       imageUrl: imageUrl || null,
       categoryId,
+      subCategory: subCategory || null,
       language,
       priceUsdMinorista,
       priceUsdMayorista,
@@ -100,12 +103,7 @@ export async function updateProductStock(id: number, newStock: number) {
 
 export async function importProductsFromCSV(parsedRows: string[][]) {
   try {
-    let currentCategoryName = "General";
-    let currentCategoryId: number | null = null;
-    let pendingCategoryName: string | null = null;
-    let currentSubtitle: string | null = null;
-    let currentLanguage = "Español";
-    let columnIndexes: Record<string, number> = {};
+
 
     // 1. Obtener todas las categorías existentes para hacer match
     const existingCats = await db.select().from(categories);
@@ -122,14 +120,35 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
     };
 
     const getOrCreateCategory = async (name: string) => {
-      const key = name.toLowerCase().trim();
+      const nameUpper = name.toUpperCase().trim();
+      
+      // 1. Intentar encontrar coincidencia exacta o si el nombre del CSV incluye el nombre oficial
+      for (const cat of existingCats) {
+        const catUpper = cat.name.toUpperCase().trim();
+        if (nameUpper === catUpper) return cat.id;
+        if (nameUpper.includes(catUpper)) return cat.id;
+      }
+      
+      // 2. Si no coincide con ninguna oficial, lo enviamos a "General" en lugar de crear basura
+      const key = "general";
       if (catMap.has(key)) return catMap.get(key)!;
-      // Crear nueva
-      const slug = key.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") || "cat-" + Date.now();
-      const [newCat] = await db.insert(categories).values({ name: name.trim(), slug }).returning({ id: categories.id });
+      
+      // Solo creamos "General" si no existe
+      const [newCat] = await db.insert(categories).values({ name: "General", slug: "general" }).returning({ id: categories.id });
       catMap.set(key, newCat.id);
+      // Lo añadimos a existingCats por si acaso
+      existingCats.push(newCat as any);
       return newCat.id;
     };
+
+    // Estado del parser
+    let pendingCategoryName: string | null = null;
+    let currentCategoryName = "";
+    let currentCategoryId: number | null = null;
+    let currentSubCategory: string | null = null;
+    let currentLanguage = "Español";
+    let currentSubtitle: string | null = null;
+    let columnIndexes: Record<string, number> = {};
 
     // 2. Iterar sobre las filas crudas del CSV
     for (let i = 0; i < parsedRows.length; i++) {
@@ -152,16 +171,46 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
       // B. Detectar fila de encabezados
       if (rowUpper.includes("PRODUCTO") || rowUpper.includes("MINORISTA USD")) {
         if (pendingCategoryName) {
-          currentCategoryName = pendingCategoryName;
-          currentCategoryId = await getOrCreateCategory(currentCategoryName);
+          const rawPendingUpper = pendingCategoryName.toUpperCase();
           
-          const upperCat = currentCategoryName.toUpperCase();
-          if (upperCat.includes("JAPONES") || upperCat.includes("JAPONÉS") || upperCat.includes("JAPANESE")) {
+          // Lógica de adivinación de categoría oficial y subcategoría
+          if (rawPendingUpper.includes("ETB")) {
+            currentCategoryName = "ETB";
+            currentLanguage = "Inglés"; // El usuario pidió que ETB siempre sea Inglés
+            currentSubCategory = rawPendingUpper.includes("MODERNO") || rawPendingUpper.includes("MODERNA") ? "Moderna" : rawPendingUpper.includes("VINTAGE") ? "Vintage" : null;
+          } else if (rawPendingUpper.includes("BOOSTER BOX") && !rawPendingUpper.includes("JAPONES")) {
+            currentCategoryName = "Booster Box";
+            currentLanguage = "Inglés"; // Si no es japonés, lo ponemos en inglés por defecto para BB
+            currentSubCategory = rawPendingUpper.includes("MODERNO") || rawPendingUpper.includes("MODERNA") ? "Moderna" : rawPendingUpper.includes("VINTAGE") ? "Vintage" : null;
+          } else if (rawPendingUpper.includes("JAPONES COMUN") || rawPendingUpper.includes("JAPONÉS COMÚN")) {
+            currentCategoryName = "Booster Box";
             currentLanguage = "Japonés";
-          } else if (upperCat.includes("INGLES") || upperCat.includes("INGLÉS") || upperCat.includes("ENGLISH")) {
+            currentSubCategory = null;
+          } else if (rawPendingUpper.includes("JAPONES ESPECIAL") || rawPendingUpper.includes("JAPONÉS ESPECIAL")) {
+            // La categoría se decidirá producto a producto (si tiene Box es Collection Box)
+            currentCategoryName = "Japonés Especial"; // Temporal
+            currentLanguage = "Japonés";
+            currentSubCategory = null;
+          } else if (rawPendingUpper.includes("COLLECTION BOX")) {
+            currentCategoryName = "Collection Box";
             currentLanguage = "Inglés";
-          } else {
+            currentSubCategory = null;
+          } else if (rawPendingUpper.includes("ACCESORIOS")) {
+            currentCategoryName = "Accesorios";
             currentLanguage = "Español";
+            currentSubCategory = null;
+          } else {
+            // Fallback general
+            currentCategoryName = pendingCategoryName;
+            currentLanguage = "Español";
+            currentSubCategory = null;
+          }
+
+          // Si NO es Japonés Especial (que se evalúa luego), buscamos su ID
+          if (currentCategoryName !== "Japonés Especial") {
+            currentCategoryId = await getOrCreateCategory(currentCategoryName);
+          } else {
+            currentCategoryId = null; // Se buscará por producto
           }
           
           pendingCategoryName = null;
@@ -170,6 +219,7 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
 
         columnIndexes = {
           name: rowUpper.indexOf("PRODUCTO"),
+          expansion: rowUpper.indexOf("EXPANSION EN INGLES"),
           minorista: rowUpper.indexOf("MINORISTA USD"),
           mayorista: rowUpper.indexOf("MAYORISTA USD"),
           stock: rowUpper.indexOf("STOCK")
@@ -194,12 +244,33 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
           continue;
         }
 
-        if (!currentCategoryId) {
-          currentCategoryId = await getOrCreateCategory("General");
+        let rawName = row[columnIndexes.name].trim();
+        
+        // Formateo de nombre si tiene expansión
+        if (columnIndexes.expansion !== undefined && columnIndexes.expansion !== -1 && row[columnIndexes.expansion]) {
+          const expansion = row[columnIndexes.expansion].trim();
+          if (expansion !== "") {
+            rawName = `${rawName} (${expansion})`;
+          }
         }
 
-        const rawName = row[columnIndexes.name].trim();
-        // Si hay un subtítulo activo, lo añadimos al nombre para darle contexto (ej: "Hidden Fates - SLEEVES ETB")
+        // Si es Japonés Especial, determinamos la categoría según si dice "Box"
+        let finalCategoryId = currentCategoryId;
+        let finalCategoryName = currentCategoryName;
+        if (currentCategoryName === "Japonés Especial" || currentCategoryId === null) {
+          if (rawName.toUpperCase().includes("BOX")) {
+            finalCategoryName = "Collection Box";
+          } else {
+            finalCategoryName = "Booster Box"; // Default para japos especiales que no son boxes
+          }
+          finalCategoryId = await getOrCreateCategory(finalCategoryName);
+        }
+
+        if (!finalCategoryId) {
+          finalCategoryId = await getOrCreateCategory("General");
+        }
+
+        // Si hay un subtítulo activo, lo añadimos al nombre para darle contexto
         const name = currentSubtitle ? `${rawName} (${currentSubtitle})` : rawName;
         const stockStr = columnIndexes.stock !== -1 ? row[columnIndexes.stock] : "";
 
@@ -211,7 +282,8 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
           name,
           description: "",
           imageUrl: null,
-          categoryId: currentCategoryId,
+          categoryId: finalCategoryId,
+          subCategory: currentSubCategory,
           language: currentLanguage,
           priceUsdMinorista: minorista.toString(),
           priceUsdMayorista: mayorista.toString(),

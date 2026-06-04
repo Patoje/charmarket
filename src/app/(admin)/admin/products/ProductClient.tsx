@@ -86,6 +86,7 @@ export function ProductClient({ products, categories }: { products: any[], categ
           <p className="text-muted-foreground mt-2">Gestiona el catálogo de productos de TCG.</p>
         </div>
         <div className="flex gap-2">
+          {/* 
           <input 
             type="file" 
             accept=".csv" 
@@ -99,7 +100,8 @@ export function ProductClient({ products, categories }: { products: any[], categ
             disabled={isImporting}
           >
             {isImporting ? "Importando..." : "Importar CSV"}
-          </Button>
+          </Button> 
+          */}
           <Button onClick={openNewProductDialog}>
             <Plus className="mr-2 h-4 w-4" /> Agregar Producto
           </Button>
@@ -112,6 +114,7 @@ export function ProductClient({ products, categories }: { products: any[], categ
             <TableRow>
               <TableHead>Nombre</TableHead>
               <TableHead>Categoría</TableHead>
+              <TableHead>Era / Subcategoría</TableHead>
               <TableHead>Idioma</TableHead>
               <TableHead>Precio Min.</TableHead>
               <TableHead>Precio May.</TableHead>
@@ -122,7 +125,7 @@ export function ProductClient({ products, categories }: { products: any[], categ
           <TableBody>
             {products.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No hay productos en el inventario. Haz clic en "Agregar Producto".
                 </TableCell>
               </TableRow>
@@ -132,6 +135,9 @@ export function ProductClient({ products, categories }: { products: any[], categ
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>
                     <Badge variant="secondary">{product.categoryName}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {product.subCategory ? <Badge variant="outline">{product.subCategory}</Badge> : <span className="text-muted-foreground">-</span>}
                   </TableCell>
                   <TableCell>{product.language}</TableCell>
                   <TableCell>USD {product.priceUsdMinorista}</TableCell>

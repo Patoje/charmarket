@@ -18,6 +18,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   // Estados de Filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todas las categorías");
+  const [subCategoryFilter, setSubCategoryFilter] = useState("Todas las subcategorías");
   const [sortBy, setSortBy] = useState("none");
   
   // Filtros Avanzados
@@ -26,12 +27,20 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [priceCurrency, setPriceCurrency] = useState<"USD" | "ARS">("USD");
+  const [hideOutOfStock, setHideOutOfStock] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [addedGridFeedback, setAddedGridFeedback] = useState<Record<number, boolean>>({});
 
   const uniqueLanguages = useMemo(() => Array.from(new Set(products.map(p => p.language))), [products]);
+
+  const availableSubCategories = useMemo(() => {
+    if (categoryFilter === "Todas las categorías") return [];
+    const productsInCat = products.filter(p => p.categoryName === categoryFilter);
+    const subs = Array.from(new Set(productsInCat.map(p => p.subCategory).filter(Boolean)));
+    return subs as string[];
+  }, [categoryFilter, products]);
 
   // Mapa de nombres de ordenamiento para asegurar que siempre diga lo correcto
   const sortLabels: Record<string, string> = {
@@ -56,6 +65,11 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
       result = result.filter(p => p.categoryName === categoryFilter);
     }
 
+    // 2.5 Filtro por SubCategoría
+    if (subCategoryFilter !== "Todas las subcategorías") {
+      result = result.filter(p => p.subCategory === subCategoryFilter);
+    }
+
     // 3. Filtro por Idioma (Avanzado)
     if (languageFilter !== "Todos") {
       result = result.filter(p => p.language === languageFilter);
@@ -73,6 +87,11 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
         }
         return targetPrice >= min && targetPrice <= max;
       });
+    }
+
+    // 4.5 Filtro Sin Stock
+    if (hideOutOfStock) {
+      result = result.filter(p => p.stock > 0);
     }
 
     // 5. Ordenamiento
@@ -93,7 +112,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
       });
     }
 
-    // 6. REGLA DE ORO: Sin stock siempre al final
+    // 6. REGLA DE ORO: Sin stock siempre al final (Solo aplica si no los ocultamos)
     result.sort((a, b) => {
       const aHasStock = a.stock > 0;
       const bHasStock = b.stock > 0;
@@ -103,7 +122,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
     });
 
     return result;
-  }, [products, searchTerm, categoryFilter, languageFilter, priceMin, priceMax, priceCurrency, sortBy, dolarValue]);
+  }, [products, searchTerm, categoryFilter, subCategoryFilter, languageFilter, priceMin, priceMax, priceCurrency, sortBy, dolarValue, hideOutOfStock]);
 
 
   // Función simple para generar un emoji representativo si no hay imagen
@@ -139,7 +158,10 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             />
           </div>
 
-          <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val || "")}>
+          <Select value={categoryFilter} onValueChange={(val) => {
+            setCategoryFilter(val || "");
+            setSubCategoryFilter("Todas las subcategorías");
+          }}>
             <SelectTrigger className="w-full md:w-[240px] bg-background/50 border-border">
               <SelectValue placeholder="Categoría" />
             </SelectTrigger>
@@ -150,6 +172,8 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               ))}
             </SelectContent>
           </Select>
+
+
 
           <Select value={sortBy} onValueChange={(val) => setSortBy(val || "")}>
             <SelectTrigger className="w-full md:w-[240px] bg-background/50 border-border">
@@ -178,7 +202,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
         {/* Filtros Avanzados Colapsables */}
         {showAdvanced && (
-          <div className="mt-6 pt-6 border-t border-border/50 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 fade-in duration-200">
+          <div className="mt-6 pt-6 border-t border-border/50 grid grid-cols-1 md:grid-cols-5 gap-6 animate-in slide-in-from-top-2 fade-in duration-200">
             
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">Idioma</Label>
@@ -193,6 +217,47 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground">Era / Subcategoría</Label>
+              <Select 
+                value={subCategoryFilter} 
+                onValueChange={(val) => setSubCategoryFilter(val || "")}
+                disabled={availableSubCategories.length === 0}
+              >
+                <SelectTrigger className="w-full bg-background/50 border-border">
+                  <SelectValue placeholder={availableSubCategories.length === 0 ? "-" : "Cualquiera"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Todas las subcategorías">Todas las subcategorías</SelectItem>
+                  {availableSubCategories.map(sub => (
+                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 flex flex-col justify-center">
+              <Label className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Disponibilidad</Label>
+              <div className="flex items-center gap-3 cursor-pointer w-fit group" onClick={() => setHideOutOfStock(!hideOutOfStock)}>
+                <button 
+                  type="button"
+                  role="switch"
+                  aria-checked={hideOutOfStock}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${hideOutOfStock ? 'bg-primary' : 'bg-muted border-border/50'}`}
+                >
+                  <span className="sr-only">Ocultar Agotados</span>
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                    style={{ transform: hideOutOfStock ? "translateX(20px)" : "translateX(0px)" }}
+                  />
+                </button>
+                <span className={`text-sm font-medium transition-colors ${hideOutOfStock ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                  Ocultar Agotados
+                </span>
+              </div>
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -228,13 +293,14 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   className="w-24 bg-background/50 border-border"
                 />
                 
-                {(priceMin || priceMax || languageFilter !== "Todos") && (
+                {(priceMin || priceMax || languageFilter !== "Todos" || hideOutOfStock) && (
                   <Button 
                     variant="ghost" 
                     onClick={() => {
                       setPriceMin("");
                       setPriceMax("");
                       setLanguageFilter("Todos");
+                      setHideOutOfStock(false);
                     }}
                     className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive ml-auto"
                   >
@@ -311,7 +377,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   {product.name}
                 </h3>
                 <p className="text-muted-foreground text-xs mb-4 uppercase tracking-wider line-clamp-1">
-                  {product.categoryName} • {product.language}
+                  {product.categoryName} {product.subCategory ? `(${product.subCategory})` : ""} • {product.language}
                 </p>
 
                 <div className="mt-auto flex items-end justify-between">
@@ -377,7 +443,14 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               {/* Lado derecho: Detalles e Info */}
               <div className="md:w-1/2 p-6 md:p-8 flex flex-col relative bg-background">
                 <DialogHeader className="mb-4 text-left">
-                  <Badge variant="secondary" className="w-fit mb-3 text-xs uppercase tracking-widest">{selectedProduct.categoryName}</Badge>
+                  <div className="flex gap-2 mb-3 flex-wrap">
+                    <Badge variant="secondary" className="w-fit text-xs uppercase tracking-widest">{selectedProduct.categoryName}</Badge>
+                    {selectedProduct.subCategory && (
+                      <Badge variant="outline" className="w-fit text-xs uppercase tracking-widest">
+                        {selectedProduct.subCategory}
+                      </Badge>
+                    )}
+                  </div>
                   <DialogTitle className="font-heading font-bold text-3xl uppercase tracking-wide leading-tight mb-2">
                     {selectedProduct.name}
                   </DialogTitle>
