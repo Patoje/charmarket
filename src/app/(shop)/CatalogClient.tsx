@@ -36,8 +36,9 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   const uniqueLanguages = useMemo(() => Array.from(new Set(products.map(p => p.language))), [products]);
 
   const availableSubCategories = useMemo(() => {
-    if (categoryFilter === "Todas las categorías") return [];
-    const productsInCat = products.filter(p => p.categoryName === categoryFilter);
+    const productsInCat = categoryFilter === "Todas las categorías" 
+      ? products 
+      : products.filter(p => p.categoryName === categoryFilter);
     const subs = Array.from(new Set(productsInCat.map(p => p.subCategory).filter(Boolean)));
     return subs as string[];
   }, [categoryFilter, products]);

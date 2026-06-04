@@ -185,12 +185,12 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
           } else if (rawPendingUpper.includes("JAPONES COMUN") || rawPendingUpper.includes("JAPONÉS COMÚN")) {
             currentCategoryName = "Booster Box";
             currentLanguage = "Japonés";
-            currentSubCategory = null;
+            currentSubCategory = "Común";
           } else if (rawPendingUpper.includes("JAPONES ESPECIAL") || rawPendingUpper.includes("JAPONÉS ESPECIAL")) {
             // La categoría se decidirá producto a producto (si tiene Box es Collection Box)
             currentCategoryName = "Japonés Especial"; // Temporal
             currentLanguage = "Japonés";
-            currentSubCategory = null;
+            currentSubCategory = "Especial";
           } else if (rawPendingUpper.includes("COLLECTION BOX")) {
             currentCategoryName = "Collection Box";
             currentLanguage = "Inglés";
@@ -257,11 +257,15 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
         // Si es Japonés Especial, determinamos la categoría según si dice "Box"
         let finalCategoryId = currentCategoryId;
         let finalCategoryName = currentCategoryName;
+        let finalSubCategory = currentSubCategory;
+        
         if (currentCategoryName === "Japonés Especial" || currentCategoryId === null) {
           if (rawName.toUpperCase().includes("BOX")) {
             finalCategoryName = "Collection Box";
+            finalSubCategory = null; // Collection boxes no llevan subcategoría "Especial"
           } else {
             finalCategoryName = "Booster Box"; // Default para japos especiales que no son boxes
+            finalSubCategory = "Especial";
           }
           finalCategoryId = await getOrCreateCategory(finalCategoryName);
         }
@@ -283,7 +287,7 @@ export async function importProductsFromCSV(parsedRows: string[][]) {
           description: "",
           imageUrl: null,
           categoryId: finalCategoryId,
-          subCategory: currentSubCategory,
+          subCategory: finalSubCategory,
           language: currentLanguage,
           priceUsdMinorista: minorista.toString(),
           priceUsdMayorista: mayorista.toString(),
