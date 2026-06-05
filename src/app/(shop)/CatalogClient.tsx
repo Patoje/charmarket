@@ -231,8 +231,8 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
           </Select>
         </div>
 
-        {/* Botón para mostrar/ocultar Filtros Avanzados */}
-        <div className="mt-4 flex items-center">
+        {/* Botones adicionales */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
           <Button 
             variant="ghost" 
             onClick={() => setShowAdvanced(!showAdvanced)}
@@ -242,6 +242,24 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             Filtros Avanzados
             {showAdvanced ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
           </Button>
+
+          {(priceMin || priceMax || languageFilter !== "Cualquier Idioma" || categoryFilter !== "Todas las categorías" || subCategoryFilter !== "Todas las subcategorías" || hideOutOfStock || searchTerm !== "") && (
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setSearchTerm("");
+                setCategoryFilter("Todas las categorías");
+                setPriceMin("");
+                setPriceMax("");
+                setLanguageFilter("Cualquier Idioma");
+                setSubCategoryFilter("Todas las subcategorías");
+                setHideOutOfStock(false);
+              }}
+              className="text-xs uppercase tracking-widest text-destructive hover:text-destructive/80 transition-colors p-0 h-auto"
+            >
+              Limpiar Todos los Filtros
+            </Button>
+          )}
         </div>
 
         {/* Filtros Avanzados Colapsables */}
@@ -336,22 +354,6 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   onChange={(e) => setPriceMax(e.target.value)}
                   className="w-24 bg-background/50 border-border"
                 />
-                
-                {(priceMin || priceMax || languageFilter !== "Cualquier Idioma" || subCategoryFilter !== "Todas las subcategorías" || hideOutOfStock) && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setPriceMin("");
-                      setPriceMax("");
-                      setLanguageFilter("Cualquier Idioma");
-                      setSubCategoryFilter("Todas las subcategorías");
-                      setHideOutOfStock(false);
-                    }}
-                    className="text-xs border-destructive text-destructive hover:bg-destructive hover:text-white ml-auto"
-                  >
-                    Limpiar Filtros
-                  </Button>
-                )}
               </div>
             </div>
 

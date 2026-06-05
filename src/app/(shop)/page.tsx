@@ -2,7 +2,7 @@ import { getProducts, getCategories } from "@/app/actions/products";
 import { getDolarValue } from "@/app/actions/config";
 import { CatalogClient } from "./CatalogClient";
 import Link from "next/link";
-import { ArrowRight, ShoppingCart, ArrowDown } from "lucide-react";
+import { ArrowRight, ShoppingCart, ArrowDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -15,13 +15,21 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-x-hidden">
       {/* Navbar Minimalista */}
-      <nav className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-center py-6 px-8 border-b border-border/50 z-50">
-        <Link href="/" className="font-heading font-bold text-2xl tracking-wider text-foreground">
-          CHARMARKET
-        </Link>
+      <nav className="fixed w-full top-0 left-0 bg-background/40 backdrop-blur-md supports-[backdrop-filter]:bg-background/40 py-6 px-4 md:px-8 border-b border-border/50 z-50">
+        <div className="container mx-auto grid grid-cols-3 items-center">
+          <div className="flex justify-start"></div>
+          <div className="flex justify-center">
+            <Link href="/" className="font-heading font-bold text-2xl tracking-wider text-foreground">
+              CHARMARKET
+            </Link>
+          </div>
+          <div className="flex justify-end">
+            {/* Espacio reservado para futuro a la derecha */}
+          </div>
+        </div>
       </nav>
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pt-[85px]">
         {/* Hero Section Viewport (100vh) */}
         <div className="min-h-[calc(100vh-85px)] flex flex-col relative container mx-auto px-4">
           
@@ -71,6 +79,51 @@ export default async function ShopPage() {
           <CatalogClient products={products} categories={categories} dolarValue={dolarValue} />
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border/50 py-12 mt-20 bg-background/50">
+        <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-6">
+          <Link href="/" className="font-heading font-bold text-2xl tracking-wider text-foreground">
+            CHARMARKET
+          </Link>
+          
+          <div className="flex flex-col md:flex-row items-center gap-6 text-muted-foreground">
+            <a 
+              href="https://www.instagram.com/charmarket.ar/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-primary transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-5 h-5"
+              >
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+              </svg>
+              <span>@charmarket.ar</span>
+            </a>
+            
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5" />
+              <span>Buenos Aires</span>
+            </div>
+          </div>
+          
+          <div className="text-sm text-muted-foreground/60 mt-4">
+            © {new Date().getFullYear()} Charmarket. Todos los derechos reservados.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
