@@ -178,12 +178,18 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
               />
             </div>
             
+            <div className="bg-muted/30 border border-border/50 rounded-lg p-3 text-center">
+              <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed uppercase tracking-widest">
+                * Al finalizar, te enviaremos a WhatsApp con el detalle de tu pedido para coordinar el pago y envío.
+              </p>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" className="h-12 rounded-lg text-xs uppercase tracking-widest font-bold border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={clearCart}>
                 Vaciar Carrito
               </Button>
-              <Button onClick={handleCheckout} disabled={isSubmitting} className="h-12 rounded-lg text-xs uppercase tracking-widest font-bold bg-[#25D366] hover:bg-[#128C7E] text-white border-none">
-                {isSubmitting ? "Procesando..." : "WhatsApp"}
+              <Button onClick={handleCheckout} disabled={isSubmitting} className="h-12 rounded-lg text-[10px] sm:text-xs uppercase tracking-widest font-bold bg-[#25D366] hover:bg-[#128C7E] text-white border-none shadow-lg shadow-[#25D366]/20">
+                {isSubmitting ? "Procesando..." : "Pedir por WhatsApp"}
               </Button>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { getProducts, getCategories } from "@/app/actions/products";
 import { getDolarValue } from "@/app/actions/config";
 import { CatalogClient } from "./CatalogClient";
 import Link from "next/link";
-import { ArrowRight, ShoppingCart, ArrowDown, MapPin } from "lucide-react";
+import { ArrowRight, ShoppingCart, ArrowDown, MapPin, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,14 @@ export default async function ShopPage() {
             </Link>
           </div>
           <div className="flex justify-end">
-            {/* Espacio reservado para futuro a la derecha */}
+            {/* Botón oculto de Admin */}
+            <Link 
+              href="/admin" 
+              className="p-2 opacity-10 hover:opacity-100 transition-opacity duration-300"
+              title="Panel de Administración"
+            >
+              <Lock className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </nav>
