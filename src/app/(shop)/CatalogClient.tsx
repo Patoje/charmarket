@@ -146,10 +146,46 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
     return "🃏";
   };
 
+  // Mapa de imágenes provisionales para categorías
+  const categoryImages: Record<string, string> = {
+    "Booster Box": "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?q=80&w=800&auto=format&fit=crop",
+    "Collection Box": "https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=800&auto=format&fit=crop",
+    "Booster Bundle": "https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=800&auto=format&fit=crop",
+    "Booster Pack": "https://images.unsplash.com/photo-1643330683233-ff2ac89b002c?q=80&w=800&auto=format&fit=crop",
+    "Accesorios": "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=800&auto=format&fit=crop",
+    "ETB": "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?q=80&w=800&auto=format&fit=crop"
+  };
+  const defaultImage = "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?q=80&w=800&auto=format&fit=crop";
+
   return (
     <div className="pb-24">
+      {/* GRILLA DE CATEGORIAS */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10 mt-4">
+        {categories.map((cat: any) => (
+          <div 
+            key={cat.id}
+            onClick={() => {
+              setCategoryFilter(cat.name);
+              setSubCategoryFilter("Todas las subcategorías");
+              document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="group relative h-32 md:h-48 border border-border/50 bg-[#1a0c05] overflow-hidden cursor-pointer flex items-center justify-center rounded-sm transition-all duration-300 hover:border-primary/80 shadow-md"
+          >
+            <div className="absolute inset-0 bg-black/60 z-10 transition-colors duration-300 group-hover:bg-black/40"></div>
+            <img 
+              src={categoryImages[cat.name] || defaultImage} 
+              alt={cat.name}
+              className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-40"
+            />
+            <span className="relative z-20 font-heading font-bold text-sm md:text-xl uppercase tracking-widest text-white/90 drop-shadow-md group-hover:text-primary transition-colors">
+              {cat.name}
+            </span>
+          </div>
+        ))}
+      </div>
+
       {/* BARRA DE FILTROS */}
-      <div className="bg-card border border-border/50 rounded-xl p-6 mb-8 mt-4 shadow-sm">
+      <div className="bg-card border border-border/50 rounded-xl p-6 mb-8 shadow-sm">
         
         {/* Filtros Principales */}
         <div className="flex flex-col md:flex-row gap-4 items-center">
