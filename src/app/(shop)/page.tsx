@@ -15,7 +15,7 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-x-hidden">
       {/* Navbar Minimalista */}
-      <nav className="fixed w-full top-0 left-0 bg-background/40 backdrop-blur-md supports-[backdrop-filter]:bg-background/40 py-6 px-4 md:px-8 border-b border-border/50 z-50">
+      <nav className="fixed w-full top-0 left-0 bg-background/20 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/20 py-6 px-4 md:px-8 border-b border-border/50 z-50">
         <div className="container mx-auto grid grid-cols-3 items-center">
           <div className="flex justify-start"></div>
           <div className="flex justify-center">
@@ -83,7 +83,7 @@ export default async function ShopPage() {
             <h2 className="font-heading text-4xl font-bold">CATÁLOGO</h2>
           </div>
           
-          <div id="catalogo" className="mb-12 mt-8 scroll-mt-24">
+          <div id="catalogo" className="mb-12 mt-8 scroll-mt-20 pb-96">
             <CatalogClient products={products} categories={categories} dolarValue={dolarValue} />
           </div>
         </div>
