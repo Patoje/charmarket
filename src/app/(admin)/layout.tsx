@@ -11,7 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex h-screen bg-muted/40 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-56 bg-card border-r flex flex-col flex-shrink-0">
+      <aside className="w-48 bg-card border-r flex flex-col flex-shrink-0">
         <div className="p-6 border-b">
           <h2 className="text-xl font-bold text-primary">Charmarket Admin</h2>
         </div>
@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
+      <main className="flex-1 p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
