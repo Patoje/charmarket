@@ -9,9 +9,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const pendingOrders = await db.select({ id: orders.id }).from(orders).where(eq(orders.status, "pending"));
   const pendingCount = pendingOrders.length;
   return (
-    <div className="flex min-h-screen bg-muted/40">
+    <div className="flex h-screen bg-muted/40 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r flex flex-col">
+      <aside className="w-64 bg-card border-r flex flex-col flex-shrink-0">
         <div className="p-6 border-b">
           <h2 className="text-xl font-bold text-primary">Charmarket Admin</h2>
         </div>
@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

@@ -60,6 +60,7 @@ export async function acceptOrder(orderId: number) {
       .set({ status: "accepted" })
       .where(eq(orders.id, orderId));
 
+    revalidatePath("/admin", "layout");
     revalidatePath("/admin/orders");
     return { success: true };
   } catch (error) {
@@ -79,6 +80,7 @@ export async function rejectOrder(orderId: number) {
       .set({ status: "rejected" })
       .where(eq(orders.id, orderId));
       
+    revalidatePath("/admin", "layout");
     revalidatePath("/admin/orders");
     return { success: true };
   } catch (error) {

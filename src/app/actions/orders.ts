@@ -2,11 +2,13 @@
 
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/db/schema";
+import { revalidatePath } from "next/cache";
 
 
 export async function createCheckoutOrder(
   customerName: string,
   totalUsd: number,
+  totalArs: number,
   items: { productId: number; quantity: number; priceUsdSnapshot: number }[]
 ) {
   try {
@@ -18,6 +20,7 @@ export async function createCheckoutOrder(
       orderNumber,
       customerName,
       totalUsd: totalUsd.toString(),
+      totalArsSnapshot: totalArs.toString(),
       status: "pending",
     }).returning({ id: orders.id });
 
@@ -32,6 +35,8 @@ export async function createCheckoutOrder(
 
       await db.insert(orderItems).values(orderItemsData);
     }
+
+    revalidatePath("/admin", "layout");
 
     return { success: true, orderNumber };
   } catch (error) {

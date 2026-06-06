@@ -59,7 +59,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
         };
       });
 
-      const res = await createCheckoutOrder(customerName, totalUsd, orderItems);
+      const res = await createCheckoutOrder(customerName, totalUsd, totalArs, orderItems);
 
       if (!res.success) {
         if (newWindow) newWindow.close();

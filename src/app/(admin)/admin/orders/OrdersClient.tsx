@@ -59,7 +59,9 @@ export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue
               </div>
               <div className="text-right">
                 <div className="text-lg font-bold text-primary">USD {order.totalUsd}</div>
-                <div className="text-sm font-semibold text-muted-foreground mt-0.5">ARS ${(Number(order.totalUsd) * dolarValue).toLocaleString("es-AR")}</div>
+                <div className="text-sm font-semibold text-muted-foreground mt-0.5">
+                  ARS ${(order.totalArsSnapshot ? Number(order.totalArsSnapshot) : (Number(order.totalUsd) * dolarValue)).toLocaleString("es-AR")}
+                </div>
                 {order.customerName && <div className="text-sm mt-1">Cliente: {order.customerName}</div>}
               </div>
             </CardHeader>
