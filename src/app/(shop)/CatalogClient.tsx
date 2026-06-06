@@ -472,33 +472,29 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
         <DialogContent className="max-w-4xl bg-background border-border/50 shadow-2xl p-0 overflow-hidden">
           {selectedProduct && (
             <div className="flex flex-col md:flex-row h-full max-h-[85vh]">
-              {/* Lado izquierdo: Imagen grande */}
-              <div className="md:w-1/2 bg-black flex items-center justify-center p-8 md:p-12 border-b md:border-b-0 md:border-r border-border/50 min-h-[300px]">
-                {selectedProduct.imageUrl ? (
+              {/* Columna Izquierda: Imagen, Título, Precio y Botón */}
+              <div className="md:w-1/2 p-6 md:p-8 flex flex-col h-full overflow-y-auto bg-background">
+                
+                {/* Imagen */}
+                <div className="relative aspect-square w-full min-h-[250px] mb-6 bg-[#0a0a0a] rounded-xl border border-border/30 overflow-hidden shrink-0">
                   <img 
-                    src={selectedProduct.imageUrl} 
+                    src={selectedProduct.imageUrl || "/placeholder.webp"} 
                     alt={selectedProduct.name}
-                    className="w-full h-full max-h-[500px] object-contain drop-shadow-2xl"
+                    className="w-full h-full object-contain p-4 drop-shadow-2xl"
                   />
-                ) : (
-                  <span className="text-9xl drop-shadow-2xl">
-                    {getProductEmoji(selectedProduct.name, selectedProduct.categoryName)}
-                  </span>
-                )}
-              </div>
-              
-              {/* Lado derecho: Detalles e Info */}
-              <div className="md:w-1/2 p-6 md:p-8 flex flex-col h-full overflow-hidden bg-background">
+                </div>
+
+                {/* Encabezado: Badges, Título, Idioma */}
                 <DialogHeader className="mb-4 text-left shrink-0">
                   <div className="flex gap-2 mb-3 flex-wrap">
                     <Badge variant="secondary" className="w-fit text-xs uppercase tracking-widest">{selectedProduct.categoryName}</Badge>
                     {selectedProduct.subCategory && (
-                      <Badge variant="outline" className="w-fit text-xs uppercase tracking-widest">
+                      <Badge variant="outline" className="w-fit text-xs uppercase tracking-widest border-primary/30 text-primary">
                         {selectedProduct.subCategory}
                       </Badge>
                     )}
                   </div>
-                  <DialogTitle className="font-heading font-bold text-3xl uppercase tracking-wide leading-tight mb-2">
+                  <DialogTitle className="font-heading font-bold text-2xl md:text-3xl uppercase tracking-wide leading-tight mb-2">
                     {selectedProduct.name}
                   </DialogTitle>
                   <DialogDescription className="uppercase tracking-widest text-xs font-medium text-muted-foreground">
@@ -506,49 +502,34 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto mb-6 pr-2">
-                  {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
+                {/* Descripción (si existe) */}
+                {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
+                  <div className="mb-6">
+                    <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
+                    <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                      {selectedProduct.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Precio y Botón */}
+                <div className="mt-auto border-t border-border/50 pt-6">
+                  <div className="flex justify-between items-end mb-6">
                     <div>
-                      <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
-                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {selectedProduct.description}
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Precio</p>
+                      <p className="text-4xl font-bold text-primary">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Disponibles</p>
+                      <p className={`text-2xl font-bold ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
+                        {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
                       </p>
                     </div>
-                  )}
-                </div>
-
-                <div className="shrink-0 mt-auto border-t border-border/50 pt-4 pb-2">
-                  <div className="flex flex-row justify-between items-start gap-4 mb-4">
-                    {/* Izquierda: Precio y Disponibles */}
-                    <div className="flex flex-col gap-3 min-w-[140px]">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Precio</p>
-                        <p className="text-3xl font-bold text-primary leading-none">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
-                        <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Disponibles</p>
-                        <p className={`text-xl font-bold leading-none ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
-                          {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Derecha: Qué Contiene */}
-                    {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
-                      <div className="flex-1 overflow-y-auto max-h-[140px] pl-2 border-l border-border/30">
-                        <h4 className="text-[10px] uppercase tracking-widest text-primary mb-1.5 font-bold">¿Qué Contiene?</h4>
-                        <div className="bg-muted/20 border border-border/40 rounded-md p-2">
-                          <p className="text-[11px] text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
-                            {selectedProduct.contains}
-                          </p>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <Button 
-                    className={`w-full h-14 uppercase tracking-widest font-bold text-sm active:scale-95 transition-all duration-300 mb-4 sm:mb-2 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white" : ""}`} 
+                    className={`w-full h-14 uppercase tracking-widest font-bold text-sm active:scale-95 transition-all duration-300 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white" : ""}`} 
                     disabled={selectedProduct.stock - (items.find((i: any) => i.product.id === selectedProduct.id)?.quantity || 0) <= 0}
                     onClick={() => {
                       addItem(selectedProduct);
@@ -559,6 +540,24 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                     {addedFeedback ? "¡Añadido al Carrito!" : selectedProduct.stock <= 0 ? "Agotado" : "Añadir al Carrito"}
                   </Button>
                 </div>
+              </div>
+
+              {/* Columna Derecha: Qué Contiene */}
+              <div className="md:w-1/2 p-6 md:p-8 bg-muted/5 border-l border-border/30 h-full overflow-y-auto">
+                {selectedProduct.contains && selectedProduct.contains.trim() !== "" ? (
+                  <div>
+                    <h4 className="text-sm uppercase tracking-widest text-primary mb-4 font-bold">¿Qué Contiene?</h4>
+                    <div className="bg-muted/20 border border-border/40 rounded-xl p-5">
+                      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
+                        {selectedProduct.contains}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground/30 text-sm uppercase tracking-widest font-medium">
+                    Sin información de contenido
+                  </div>
+                )}
               </div>
             </div>
           )}
