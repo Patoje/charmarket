@@ -21,6 +21,10 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   const [subCategoryFilter, setSubCategoryFilter] = useState("Todas las subcategorías");
   const [sortBy, setSortBy] = useState("none");
   
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  
   // Filtros Avanzados
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [languageFilter, setLanguageFilter] = useState("Cualquier Idioma");
@@ -155,6 +159,18 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
     return result;
   }, [products, searchTerm, categoryFilter, subCategoryFilter, languageFilter, priceMin, priceMax, priceCurrency, sortBy, dolarValue, hideOutOfStock]);
+
+  // Reseteo de Paginación al cambiar cualquier filtro
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter, subCategoryFilter, languageFilter, priceMin, priceMax, priceCurrency, sortBy, hideOutOfStock]);
+
+  // Aplicar Paginación
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedProducts, currentPage, itemsPerPage]);
 
 
   // Función simple para generar un emoji representativo si no hay imagen
@@ -386,14 +402,37 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
       </div>
 
       {/* GRILLA DE RESULTADOS */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <span className="text-[0.7rem] uppercase tracking-widest text-muted-foreground">
-          Mostrando {filteredAndSortedProducts.length} productos
+          Mostrando {filteredAndSortedProducts.length} productos {totalPages > 1 && `(Página ${currentPage} de ${totalPages})`}
         </span>
+        
+        {/* Selector de cantidad por página */}
+        <div className="flex items-center gap-2">
+          <span className="text-[0.65rem] uppercase tracking-widest text-muted-foreground">Mostrar:</span>
+          <Select 
+            value={itemsPerPage.toString()} 
+            onValueChange={(val) => {
+              setItemsPerPage(Number(val));
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[80px] h-8 text-xs bg-background/50 border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[12, 18, 24, 30, 36].map(num => (
+                <SelectItem key={num} value={num.toString()} className="text-xs">
+                  {num}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredAndSortedProducts.map((product) => {
+        {paginatedProducts.map((product) => {
           const cartItem = items.find(i => i.product.id === product.id);
           const currentQtyInCart = cartItem?.quantity || 0;
           const availableToAdd = product.stock - currentQtyInCart;
@@ -490,6 +529,67 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
           </div>
         )}
       </div>
+
+      {/* CONTROLES DE PAGINACIÓN */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-12 gap-2">
+          <Button 
+            variant="outline" 
+            className="text-xs uppercase tracking-widest font-bold border-border"
+            onClick={() => {
+              setCurrentPage(p => Math.max(1, p - 1));
+              document.getElementById("catalogo-search")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </Button>
+          
+          <div className="flex gap-1 px-2">
+            {Array.from({ length: totalPages }).map((_, i) => {
+              const pageNumber = i + 1;
+              // Mostrar 1era, última, actual y +/- 1 de la actual
+              if (
+                pageNumber === 1 || 
+                pageNumber === totalPages || 
+                (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+              ) {
+                return (
+                  <Button
+                    key={i}
+                    variant={currentPage === pageNumber ? "default" : "outline"}
+                    className={`w-9 h-9 md:w-10 md:h-10 p-0 rounded-full font-bold ${currentPage === pageNumber ? 'bg-primary text-primary-foreground border-primary' : 'border-border/50 text-muted-foreground hover:text-foreground'}`}
+                    onClick={() => {
+                      setCurrentPage(pageNumber);
+                      document.getElementById("catalogo-search")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                  >
+                    {pageNumber}
+                  </Button>
+                );
+              } else if (
+                pageNumber === currentPage - 2 || 
+                pageNumber === currentPage + 2
+              ) {
+                return <span key={i} className="text-muted-foreground flex items-end justify-center w-6 pb-2">...</span>;
+              }
+              return null;
+            })}
+          </div>
+
+          <Button 
+            variant="outline" 
+            className="text-xs uppercase tracking-widest font-bold border-border"
+            onClick={() => {
+              setCurrentPage(p => Math.min(totalPages, p + 1));
+              document.getElementById("catalogo-search")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </Button>
+        </div>
+      )}
 
       {/* Modal de Detalle de Producto */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>

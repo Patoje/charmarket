@@ -62,14 +62,31 @@ export default async function ShopPage() {
               </p>
             </div>
 
-            {/* Huge Charmander Silhouette / User Image */}
-            <div className="absolute top-0 right-0 h-full w-1/2 pointer-events-none z-0 hidden md:flex items-center justify-end pr-10">
-              {/* Intentamos cargar charmander.png de la carpeta public. Si no la subiste aún, se verá un ícono roto hasta que lo hagas. */}
-              <img 
-                src="/charmander.png" 
-                alt="Charmander Silhouette"
-                className="h-[500px] w-auto object-contain opacity-60 drop-shadow-2xl"
-              />
+            {/* Stats Widget - TCG Card Style */}
+            <div className="absolute bottom-0 right-0 z-20 flex items-end justify-end pb-8 pr-4 md:pr-10">
+              <div className="flex gap-4 md:gap-8 text-right">
+                
+                {/* Carta Productos */}
+                <div className="relative group cursor-default">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/50 to-transparent rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+                  <div className="relative flex flex-col items-center justify-center w-32 h-44 md:w-40 md:h-56 bg-card/40 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl transition-transform duration-500 group-hover:-translate-y-2">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-xl pointer-events-none"></div>
+                    <span className="font-heading font-bold text-5xl md:text-7xl text-primary leading-none mb-2 drop-shadow-md">{products.length}</span>
+                    <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold text-foreground">Productos</span>
+                  </div>
+                </div>
+
+                {/* Carta Categorías */}
+                <div className="relative group cursor-default mt-8 md:mt-12">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/50 to-transparent rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+                  <div className="relative flex flex-col items-center justify-center w-32 h-44 md:w-40 md:h-56 bg-card/40 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl transition-transform duration-500 group-hover:-translate-y-2">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-xl pointer-events-none"></div>
+                    <span className="font-heading font-bold text-5xl md:text-7xl text-primary leading-none mb-2 drop-shadow-md">{categories.length}</span>
+                    <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold text-foreground">Categorías</span>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
 
