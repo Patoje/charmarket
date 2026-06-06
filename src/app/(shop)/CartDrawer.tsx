@@ -70,7 +70,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
 
       const { orderNumber } = res;
 
-      let message = `*Nuevo Pedido Charmarket* 🔥\n*Orden:* ${orderNumber}\n*Cliente:* ${customerName}\n\n`;
+      let message = `*Nuevo Pedido Charmarket*\n*Orden:* ${orderNumber}\n*Cliente:* ${customerName}\n\n`;
       items.forEach((item) => {
         const isMayorista = item.quantity >= 5;
         const price = isMayorista ? Number(item.product.priceUsdMayorista) : Number(item.product.priceUsdMinorista);
