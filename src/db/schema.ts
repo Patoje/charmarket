@@ -19,6 +19,7 @@ export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
+  contains: text("contains"),
   imageUrl: text("image_url"),
   categoryId: integer("category_id").references(() => categories.id).notNull(),
   subCategory: varchar("sub_category", { length: 100 }), // Moderna, Vintage, etc.

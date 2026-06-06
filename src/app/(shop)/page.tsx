@@ -75,7 +75,7 @@ export default async function ShopPage() {
 
         {/* Catálogo Section (Abajo del fold) */}
         <div className="container mx-auto px-4">
-          <div id="catalogo" className="mb-12 mt-8">
+          <div className="mb-12 mt-8">
             <div className="flex items-center gap-4 mb-4">
               <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
               <span className="text-[0.72rem] uppercase tracking-[0.18em] text-primary font-bold">Catálogo Destacado</span>
@@ -83,7 +83,9 @@ export default async function ShopPage() {
             <h2 className="font-heading text-4xl font-bold">CATÁLOGO</h2>
           </div>
           
-          <CatalogClient products={products} categories={categories} dolarValue={dolarValue} />
+          <div id="catalogo" className="mb-12 mt-8 scroll-mt-32">
+            <CatalogClient products={products} categories={categories} dolarValue={dolarValue} />
+          </div>
         </div>
       </main>
 

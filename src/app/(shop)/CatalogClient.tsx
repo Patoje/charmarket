@@ -515,6 +515,17 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   </div>
                 )}
 
+                {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
+                  <div className="flex-1 overflow-y-auto mb-6 pr-2">
+                    <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">¿Qué Contiene?</h4>
+                    <div className="bg-muted/30 border border-border/50 rounded-lg p-4">
+                      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
+                        {selectedProduct.contains}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-auto border-t border-border/50 pt-6">
                   <div className="flex justify-between items-end mb-6">
                     <div>
@@ -531,7 +542,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   </div>
 
                   <Button 
-                    className={`w-full h-14 uppercase tracking-widest font-bold text-sm active:scale-95 transition-all duration-300 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white" : ""}`} 
+                    className={`w-full h-14 uppercase tracking-widest font-bold text-sm active:scale-95 transition-all duration-300 mb-4 sm:mb-2 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white" : ""}`} 
                     disabled={selectedProduct.stock - (items.find((i: any) => i.product.id === selectedProduct.id)?.quantity || 0) <= 0}
                     onClick={() => {
                       addItem(selectedProduct);

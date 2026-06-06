@@ -10,6 +10,7 @@ export async function getProducts() {
     id: products.id,
     name: products.name,
     description: products.description,
+    contains: products.contains,
     imageUrl: products.imageUrl,
     categoryId: products.categoryId,
     categoryName: categories.name,
@@ -36,6 +37,7 @@ export async function saveProduct(formData: FormData) {
     const id = formData.get("productId") ? parseInt(formData.get("productId") as string) : null;
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
+    const contains = formData.get("contains") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const categoryId = parseInt(formData.get("categoryId") as string);
     const subCategory = formData.get("subCategory") as string;
@@ -51,6 +53,7 @@ export async function saveProduct(formData: FormData) {
     const values = {
       name,
       description,
+      contains: contains || null,
       imageUrl: imageUrl || null,
       categoryId,
       subCategory: subCategory || null,

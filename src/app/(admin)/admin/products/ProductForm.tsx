@@ -181,6 +181,19 @@ export function ProductForm({
           <Textarea id="description" name="description" placeholder="Detalles del producto..." defaultValue={initialData?.description || ""} />
         </div>
 
+        {categoryName !== "Accesorios" && (
+          <div className="space-y-2 col-span-2">
+            <Label htmlFor="contains">¿Qué contiene la caja? (Opcional)</Label>
+            <Textarea 
+              id="contains" 
+              name="contains" 
+              placeholder="Ej: 10 sobres, 1 carta promo..." 
+              defaultValue={initialData?.contains || ""} 
+              className="min-h-[80px]"
+            />
+          </div>
+        )}
+
         <div className="space-y-2 col-span-2">
           <Label>Imagen del Producto</Label>
           <div className="flex flex-col sm:flex-row gap-6 items-start p-4 border border-border/50 rounded-xl bg-background/50">
