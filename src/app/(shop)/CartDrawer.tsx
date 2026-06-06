@@ -13,6 +13,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, totalItems } = useCart();
   const [animate, setAnimate] = useState(false);
   const [customerName, setCustomerName] = useState("");
+  const [nameError, setNameError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -36,9 +37,10 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
 
   const handleCheckout = async () => {
     if (!customerName.trim()) {
-      alert("Por favor ingresa tu nombre para continuar.");
+      setNameError("⚠️ ¡Necesitamos tu nombre para preparar el pedido!");
       return;
     }
+    setNameError("");
 
     // Abrimos la pestaña NUEVA inmediatamente para que el navegador no lo bloquee por el "await"
     const newWindow = window.open("about:blank", "_blank");
@@ -138,7 +140,13 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 bg-background border border-border/50 rounded-full px-1 py-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/20 hover:text-primary" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 rounded-full hover:bg-primary/20 hover:text-primary disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-current" 
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                      >
                         <Minus className="h-3 w-3" />
                       </Button>
                       <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
@@ -169,13 +177,24 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
               </div>
             </div>
             
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col gap-2">
               <Input 
                 placeholder="Ingresa tu nombre..." 
                 value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                className="h-12 border-border focus-visible:ring-primary font-bold"
+                onChange={(e) => {
+                  setCustomerName(e.target.value);
+                  if (e.target.value.trim()) setNameError("");
+                }}
+                className={cn(
+                  "h-12 border-border focus-visible:ring-primary font-bold",
+                  nameError && "border-destructive focus-visible:ring-destructive"
+                )}
               />
+              {nameError && (
+                <p className="text-destructive text-xs font-bold tracking-widest uppercase animate-in fade-in slide-in-from-top-1">
+                  {nameError}
+                </p>
+              )}
             </div>
             
             <div className="bg-muted/30 border border-border/50 rounded-lg p-3 text-center">

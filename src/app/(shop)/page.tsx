@@ -16,16 +16,9 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-x-hidden">
       {/* Navbar Minimalista */}
-      <nav className="fixed w-full top-0 left-0 bg-black/80 backdrop-blur-3xl supports-[backdrop-filter]:bg-black/60 py-6 px-4 md:px-8 border-b border-border/50 z-50">
+      <nav className="fixed w-full top-0 left-0 bg-[#0e0803] py-5 px-4 md:px-8 border-b border-border/50 z-50">
         <div className="container mx-auto grid grid-cols-3 items-center">
-          <div className="flex justify-start"></div>
-          <div className="flex justify-center">
-            <Link href="/" className="font-heading font-bold text-2xl tracking-wider text-foreground">
-              CHARMARKET
-            </Link>
-          </div>
-          <div className="flex justify-end">
-            {/* Botón oculto de Admin */}
+          <div className="flex justify-start">
             <Link 
               href="/admin" 
               className="p-2 opacity-10 hover:opacity-100 transition-opacity duration-300"
@@ -33,6 +26,16 @@ export default async function ShopPage() {
             >
               <Lock className="w-4 h-4" />
             </Link>
+          </div>
+          <div className="flex justify-center">
+            <Link href="/" className="font-heading font-bold text-2xl tracking-wider text-foreground">
+              CHARMARKET
+            </Link>
+          </div>
+          <div className="flex justify-end gap-3 md:gap-6 text-xs md:text-sm font-heading tracking-widest uppercase font-medium text-foreground">
+            <Link href="#catalogo" className="hover:text-primary transition-colors">Catálogo</Link>
+            <Link href="#envios" className="hover:text-primary transition-colors">Envíos</Link>
+            <Link href="#faqs" className="hover:text-primary transition-colors">FAQs</Link>
           </div>
         </div>
       </nav>
@@ -128,7 +131,7 @@ export default async function ShopPage() {
           </div>
 
           {/* CÓMO SON LOS ENVÍOS */}
-          <div className="mb-24">
+          <div id="envios" className="mb-24 scroll-mt-28">
             <div className="flex flex-col items-center text-center mb-12">
               <div className="flex items-center gap-4 mb-4">
                 <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
@@ -195,7 +198,7 @@ export default async function ShopPage() {
           </div>
 
           {/* PREGUNTAS FRECUENTES (Acordeón) */}
-          <div className="max-w-3xl mx-auto">
+          <div id="faqs" className="max-w-3xl mx-auto scroll-mt-28">
             <div className="flex flex-col items-center text-center mb-10">
               <div className="flex items-center gap-4 mb-4">
                 <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
