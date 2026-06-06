@@ -124,7 +124,7 @@ export default async function ShopPage() {
             
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5" />
-              <span>Buenos Aires</span>
+              <span>Adolfo Alsina 4327, Vicente López, Buenos Aires</span>
             </div>
           </div>
           

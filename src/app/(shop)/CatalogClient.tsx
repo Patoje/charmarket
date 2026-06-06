@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ShoppingCart, Filter, Search, ChevronDown, ChevronUp, Globe, Info, PackageOpen, CheckCircle } from "lucide-react";
+import { ShoppingCart, Filter, Search, ChevronDown, ChevronUp, Globe, Info, PackageOpen, CheckCircle, Share2, Check } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 import { CartDrawer } from "./CartDrawer";
 
@@ -32,6 +32,30 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [addedGridFeedback, setAddedGridFeedback] = useState<Record<number, boolean>>({});
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get("product");
+      if (productId && products) {
+        const productToOpen = products.find(p => String(p.id) === productId);
+        if (productToOpen) {
+          setSelectedProduct(productToOpen);
+          // Remove param from URL to keep it clean after opening
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }
+    }
+  }, [products]);
+
+  const handleCopyLink = () => {
+    if (!selectedProduct) return;
+    const url = `${window.location.origin}?product=${selectedProduct.id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
 
   const uniqueLanguages = useMemo(() => Array.from(new Set(products.map(p => p.language))), [products]);
 
@@ -501,9 +525,30 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                 </div>
 
                 {/* Título e Idioma */}
-                <DialogTitle className="font-heading font-bold text-3xl md:text-4xl uppercase tracking-wide leading-tight mb-2 text-foreground">
-                  {selectedProduct.name}
-                </DialogTitle>
+                <div className="flex justify-between items-start gap-4 mb-2">
+                  <DialogTitle className="font-heading font-bold text-3xl md:text-4xl uppercase tracking-wide leading-tight text-foreground">
+                    {selectedProduct.name}
+                  </DialogTitle>
+                  <div className="relative flex flex-col items-center">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="shrink-0 rounded-full h-10 w-10 border-border/50 bg-background/50 hover:bg-primary/20 hover:scale-110 hover:border-primary/50 transition-all duration-300 group"
+                      onClick={handleCopyLink}
+                      title="Copiar link del producto"
+                    >
+                      {copiedLink ? (
+                        <Check className="w-5 h-5 text-green-500 scale-110 transition-transform duration-300" />
+                      ) : (
+                        <Share2 className="w-4 h-4 text-foreground/70 group-hover:text-primary transition-colors" />
+                      )}
+                    </Button>
+                    {/* Texto que aparece cuando se copia */}
+                    <div className={`absolute -bottom-8 whitespace-nowrap text-[10px] uppercase tracking-widest font-bold bg-green-500/20 text-green-500 px-2 py-1 rounded-md transition-all duration-300 ${copiedLink ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
+                      ¡Link Copiado!
+                    </div>
+                  </div>
+                </div>
                 <DialogDescription className="uppercase tracking-widest text-xs font-semibold text-muted-foreground mb-6 flex items-center gap-2">
                   <Globe className="w-4 h-4" /> Idioma: <span className="text-foreground">{selectedProduct.language}</span>
                 </DialogDescription>
