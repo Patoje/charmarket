@@ -269,8 +269,8 @@ export function ProductForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="priceUsdMayorista">Precio Mayorista (USD)</Label>
-          <Input id="priceUsdMayorista" name="priceUsdMayorista" type="number" step="0.01" defaultValue={initialData?.priceUsdMayorista} required />
+          <Label htmlFor="priceUsdMayorista">Precio Mayorista (USD) (Opcional)</Label>
+          <Input id="priceUsdMayorista" name="priceUsdMayorista" type="number" step="0.01" defaultValue={initialData?.priceUsdMayorista} />
         </div>
 
       </div>

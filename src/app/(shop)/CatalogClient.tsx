@@ -431,7 +431,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
         {paginatedProducts.map((product) => {
           const cartItem = items.find(i => i.product.id === product.id);
           const currentQtyInCart = cartItem?.quantity || 0;
@@ -483,7 +483,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
               {/* Contenido */}
               <div className="p-5 flex-1 flex flex-col border-t border-border/50">
-                <h3 className="font-heading font-bold text-lg tracking-wide mb-1 uppercase line-clamp-1">
+                <h3 className="font-heading font-bold text-base tracking-wide mb-1 uppercase line-clamp-2 leading-tight min-h-[2.5rem]">
                   {product.name}
                 </h3>
                 <p className="text-muted-foreground text-xs mb-4 uppercase tracking-wider line-clamp-1">
