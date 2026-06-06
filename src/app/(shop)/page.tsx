@@ -83,7 +83,7 @@ export default async function ShopPage() {
             <h2 className="font-heading text-4xl font-bold">CATÁLOGO</h2>
           </div>
           
-          <div id="catalogo" className="mb-12 mt-8 scroll-mt-32">
+          <div id="catalogo" className="mb-12 mt-8 scroll-mt-24">
             <CatalogClient products={products} categories={categories} dolarValue={dolarValue} />
           </div>
         </div>

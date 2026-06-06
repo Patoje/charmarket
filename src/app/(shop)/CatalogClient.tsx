@@ -515,30 +515,34 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                   </div>
                 )}
 
-                {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
-                  <div className="flex-1 overflow-y-auto mb-6 pr-2">
-                    <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">¿Qué Contiene?</h4>
-                    <div className="bg-muted/30 border border-border/50 rounded-lg p-4">
-                      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
-                        {selectedProduct.contains}
-                      </p>
+                <div className="mt-auto border-t border-border/50 pt-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+                    {/* Izquierda: Precio y Disponibles */}
+                    <div className="flex flex-col gap-3 min-w-[140px]">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Precio</p>
+                        <p className="text-3xl font-bold text-primary leading-none">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Disponibles</p>
+                        <p className={`text-xl font-bold leading-none ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
+                          {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
 
-                <div className="mt-auto border-t border-border/50 pt-6">
-                  <div className="flex justify-between items-end mb-6">
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Precio</p>
-                      <p className="text-4xl font-bold text-primary">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Disponibles</p>
-                      <p className={`text-2xl font-bold ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
-                        {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
-                      </p>
-                    </div>
+                    {/* Derecha: Qué Contiene */}
+                    {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
+                      <div className="flex-1 w-full max-h-[120px] overflow-y-auto">
+                        <h4 className="text-[10px] uppercase tracking-widest text-primary mb-1 font-bold">¿Qué Contiene?</h4>
+                        <div className="bg-muted/30 border border-border/50 rounded-lg p-2.5">
+                          <p className="text-[11px] sm:text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
+                            {selectedProduct.contains}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <Button 
