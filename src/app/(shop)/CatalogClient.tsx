@@ -148,12 +148,12 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
   // Mapa de imágenes provisionales para categorías
   const categoryImages: Record<string, string> = {
-    "Booster Box": "https://m.media-amazon.com/images/I/81tXgqfV+NL._AC_SL1500_.jpg",
-    "Collection Box": "https://m.media-amazon.com/images/I/81R4-5XQhWL._AC_SL1500_.jpg",
-    "Booster Bundle": "https://m.media-amazon.com/images/I/71y+W08v81L._AC_SL1500_.jpg",
-    "Booster Pack": "https://m.media-amazon.com/images/I/71wYV3Mv9hL._AC_SL1500_.jpg",
-    "Accesorios": "https://m.media-amazon.com/images/I/71y2X0bL7LL._AC_SL1500_.jpg",
-    "ETB": "https://m.media-amazon.com/images/I/81Pj6E0W8aL._AC_SL1500_.jpg"
+    "Booster Box": "/categories/BOOSTERBOX.webp",
+    "Collection Box": "/categories/COLLECTIONBOX.webp",
+    "Booster Bundle": "/categories/BOOSTERBUNDLE.webp",
+    "Booster Pack": "/categories/BOOSTERPACK.webp",
+    "Accesorios": "/categories/SLEEVED.webp",
+    "ETB": "/categories/ETB.webp"
   };
   const defaultImage = "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?q=80&w=800&auto=format&fit=crop";
 

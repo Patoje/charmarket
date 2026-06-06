@@ -180,7 +180,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
             
             <div className="bg-muted/30 border border-border/50 rounded-lg p-3 text-center">
               <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed uppercase tracking-widest">
-                 Al finalizar, te enviaremos a WhatsApp con el detalle de tu pedido para coordinar el pago y envío.
+                Al finalizar, te enviaremos a WhatsApp con el detalle de tu pedido para coordinar el pago y envío.
               </p>
             </div>
             
