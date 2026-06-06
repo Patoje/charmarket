@@ -15,7 +15,7 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-x-hidden">
       {/* Navbar Minimalista */}
-      <nav className="fixed w-full top-0 left-0 bg-background/20 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/20 py-6 px-4 md:px-8 border-b border-border/50 z-50">
+      <nav className="fixed w-full top-0 left-0 bg-background/80 backdrop-blur-3xl supports-[backdrop-filter]:bg-background/80 py-6 px-4 md:px-8 border-b border-border/50 z-50">
         <div className="container mx-auto grid grid-cols-3 items-center">
           <div className="flex justify-start"></div>
           <div className="flex justify-center">

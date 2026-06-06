@@ -469,7 +469,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
       {/* Modal de Detalle de Producto */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
-        <DialogContent className="max-w-3xl bg-background border-border/50 shadow-2xl p-0 overflow-hidden sm:max-w-4xl">
+        <DialogContent className="max-w-4xl bg-background border-border/50 shadow-2xl p-0 overflow-hidden">
           {selectedProduct && (
             <div className="flex flex-col md:flex-row h-full max-h-[85vh]">
               {/* Lado izquierdo: Imagen grande */}
@@ -488,8 +488,8 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               </div>
               
               {/* Lado derecho: Detalles e Info */}
-              <div className="md:w-1/2 p-6 md:p-8 flex flex-col relative bg-background">
-                <DialogHeader className="mb-4 text-left">
+              <div className="md:w-1/2 p-6 md:p-8 flex flex-col h-full overflow-hidden bg-background">
+                <DialogHeader className="mb-4 text-left shrink-0">
                   <div className="flex gap-2 mb-3 flex-wrap">
                     <Badge variant="secondary" className="w-fit text-xs uppercase tracking-widest">{selectedProduct.categoryName}</Badge>
                     {selectedProduct.subCategory && (
@@ -507,48 +507,44 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                 </DialogHeader>
 
                 <div className="flex-1 overflow-y-auto mb-6 pr-2">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 h-full content-start">
-                    {/* Columna Izquierda: Descripción */}
+                  {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
                     <div>
-                      {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
-                        <>
-                          <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
-                          <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                            {selectedProduct.description}
-                          </p>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Columna Derecha: Qué Contiene */}
-                    <div>
-                      {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
-                        <>
-                          <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold text-right sm:text-left">¿Qué Contiene?</h4>
-                          <div className="bg-muted/30 border border-border/50 rounded-lg p-3 text-right sm:text-left">
-                            <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
-                              {selectedProduct.contains}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-auto border-t border-border/50 pt-6">
-                  <div className="flex justify-between items-end mb-6">
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Precio</p>
-                      <p className="text-4xl font-bold text-primary">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Disponibles</p>
-                      <p className={`text-2xl font-bold ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
-                        {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
+                      <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
+                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {selectedProduct.description}
                       </p>
                     </div>
+                  )}
+                </div>
+
+                <div className="shrink-0 mt-auto border-t border-border/50 pt-4 pb-2">
+                  <div className="flex flex-row justify-between items-start gap-4 mb-4">
+                    {/* Izquierda: Precio y Disponibles */}
+                    <div className="flex flex-col gap-3 min-w-[140px]">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Precio</p>
+                        <p className="text-3xl font-bold text-primary leading-none">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Disponibles</p>
+                        <p className={`text-xl font-bold leading-none ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
+                          {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Derecha: Qué Contiene */}
+                    {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
+                      <div className="flex-1 overflow-y-auto max-h-[140px] pl-2 border-l border-border/30">
+                        <h4 className="text-[10px] uppercase tracking-widest text-primary mb-1.5 font-bold">¿Qué Contiene?</h4>
+                        <div className="bg-muted/20 border border-border/40 rounded-md p-2">
+                          <p className="text-[11px] text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
+                            {selectedProduct.contains}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <Button 
