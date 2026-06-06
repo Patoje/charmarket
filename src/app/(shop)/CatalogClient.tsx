@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ShoppingCart, Filter, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { ShoppingCart, Filter, Search, ChevronDown, ChevronUp, Globe, Info, PackageOpen, CheckCircle } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 import { CartDrawer } from "./CartDrawer";
 
@@ -469,67 +469,103 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
       {/* Modal de Detalle de Producto */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
-        <DialogContent className="max-w-4xl bg-background border-border/50 shadow-2xl p-0 overflow-hidden">
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-4xl md:max-w-5xl w-full bg-background border-border/50 shadow-2xl p-6 md:p-8 rounded-2xl overflow-hidden">
           {selectedProduct && (
-            <div className="flex flex-col sm:flex-row h-full max-h-[85vh]">
-              {/* Columna Izquierda: Imagen, Título, Precio y Botón */}
-              <div className={`${selectedProduct.contains && selectedProduct.contains.trim() !== "" ? "sm:w-1/2" : "w-full"} p-6 sm:p-8 flex flex-col h-full overflow-y-auto bg-background`}>
-                
-                {/* Imagen */}
-                <div className="relative aspect-square w-full min-h-[250px] mb-6 bg-[#0a0a0a] rounded-xl border border-border/30 overflow-hidden shrink-0">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-auto">
+              
+              {/* Columna Izquierda: Imagen (Más chica y proporcionada) */}
+              <div className="bg-[#0a0a0a] rounded-xl relative flex items-center justify-center p-6 border border-border/50 shrink-0 self-start mx-auto w-full max-w-[300px]">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-30 rounded-xl"></div>
+                <div className="relative w-full aspect-square">
                   <img 
                     src={selectedProduct.imageUrl || "/placeholder.webp"} 
                     alt={selectedProduct.name}
-                    className="w-full h-full object-contain p-4 drop-shadow-2xl"
+                    className="w-full h-full object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500"
                   />
                 </div>
+              </div>
 
-                {/* Encabezado: Badges, Título, Idioma */}
-                <DialogHeader className="mb-4 text-left shrink-0">
-                  <div className="flex gap-2 mb-3 flex-wrap">
-                    <Badge variant="secondary" className="w-fit text-xs uppercase tracking-widest">{selectedProduct.categoryName}</Badge>
-                    {selectedProduct.subCategory && (
-                      <Badge variant="outline" className="w-fit text-xs uppercase tracking-widest border-primary/30 text-primary">
-                        {selectedProduct.subCategory}
-                      </Badge>
-                    )}
-                  </div>
-                  <DialogTitle className="font-heading font-bold text-2xl sm:text-3xl uppercase tracking-wide leading-tight mb-2">
-                    {selectedProduct.name}
-                  </DialogTitle>
-                  <DialogDescription className="uppercase tracking-widest text-xs font-medium text-muted-foreground">
-                    Idioma: {selectedProduct.language}
-                  </DialogDescription>
-                </DialogHeader>
+              {/* Columna Derecha: Toda la información */}
+              <div className="flex flex-col h-full">
+                
+                {/* Filtros / Badges */}
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  <Badge variant="secondary" className="w-fit text-xs uppercase tracking-widest px-3 py-1 bg-primary/20 text-primary border-none">
+                    {selectedProduct.categoryName}
+                  </Badge>
+                  {selectedProduct.subCategory && (
+                    <Badge variant="outline" className="w-fit text-xs uppercase tracking-widest px-3 py-1 border-primary/40 text-primary">
+                      {selectedProduct.subCategory}
+                    </Badge>
+                  )}
+                </div>
 
-                {/* Descripción (si existe) */}
-                {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
-                  <div className="mb-6">
-                    <h4 className="text-xs uppercase tracking-widest text-primary mb-2 font-bold">Descripción</h4>
-                    <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                      {selectedProduct.description}
-                    </p>
-                  </div>
-                )}
+                {/* Título e Idioma */}
+                <DialogTitle className="font-heading font-bold text-3xl md:text-4xl uppercase tracking-wide leading-tight mb-2 text-foreground">
+                  {selectedProduct.name}
+                </DialogTitle>
+                <DialogDescription className="uppercase tracking-widest text-xs font-semibold text-muted-foreground mb-6 flex items-center gap-2">
+                  <Globe className="w-4 h-4" /> Idioma: <span className="text-foreground">{selectedProduct.language}</span>
+                </DialogDescription>
 
-                {/* Precio y Botón */}
-                <div className="mt-auto border-t border-border/50 pt-6">
-                  <div className="flex justify-between items-end mb-6">
+                {/* Contenido Medio (Grid de 2 columnas para Qué Contiene y Descripción) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                  
+                  {/* Qué Contiene */}
+                  {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
                     <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Precio</p>
-                      <p className="text-4xl font-bold text-primary">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}</p>
+                      <h4 className="text-xs uppercase tracking-widest text-primary mb-3 font-bold flex items-center gap-2">
+                        <PackageOpen className="w-4 h-4" /> ¿Qué Contiene?
+                      </h4>
+                      <div className="bg-muted/10 border border-border/40 rounded-xl p-4 shadow-inner">
+                        <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
+                          {selectedProduct.contains}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Disponibles</p>
-                      <p className={`text-2xl font-bold ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
-                        {selectedProduct.stock > 0 ? selectedProduct.stock : "Agotado"}
+                  )}
+
+                  {/* Descripción */}
+                  {selectedProduct.description && selectedProduct.description.trim() !== "" && selectedProduct.description !== "No hay detalles adicionales para este producto." && (
+                    <div>
+                      <h4 className="text-xs uppercase tracking-widest text-primary mb-3 font-bold flex items-center gap-2">
+                        <Info className="w-4 h-4" /> Descripción
+                      </h4>
+                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {selectedProduct.description}
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Footer: Precio, Stock, Botón (Fijo al fondo de la columna) */}
+                <div className="mt-auto pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-6">
+                  
+                  <div className="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-start">
+                    {/* Precio */}
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Precio</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl md:text-4xl font-bold text-primary tracking-tight">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium mt-1">
+                        ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}
+                      </p>
+                    </div>
+
+                    {/* Stock */}
+                    <div className="flex flex-col gap-1 text-right sm:text-left">
+                      <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Stock</p>
+                      <p className={`text-xl md:text-2xl font-bold tracking-tight ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
+                        {selectedProduct.stock > 0 ? `${selectedProduct.stock} u.` : "Agotado"}
                       </p>
                     </div>
                   </div>
 
+                  {/* Botón Añadir */}
                   <Button 
-                    className={`w-full h-14 uppercase tracking-widest font-bold text-sm active:scale-95 transition-all duration-300 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white" : ""}`} 
+                    className={`w-full sm:w-auto h-14 px-8 text-sm uppercase tracking-widest font-black active:scale-[0.98] transition-all duration-300 rounded-xl shadow-lg hover:shadow-primary/25 shrink-0 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/25" : ""}`} 
                     disabled={selectedProduct.stock - (items.find((i: any) => i.product.id === selectedProduct.id)?.quantity || 0) <= 0}
                     onClick={() => {
                       addItem(selectedProduct);
@@ -537,22 +573,17 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                       setTimeout(() => setAddedFeedback(false), 1500);
                     }}
                   >
-                    {addedFeedback ? "¡Añadido al Carrito!" : selectedProduct.stock <= 0 ? "Agotado" : "Añadir al Carrito"}
+                    {addedFeedback ? (
+                      <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5" /> Añadido</span>
+                    ) : selectedProduct.stock <= 0 ? (
+                      "Agotado"
+                    ) : (
+                      <span className="flex items-center gap-2"><ShoppingCart className="w-5 h-5" /> Añadir</span>
+                    )}
                   </Button>
                 </div>
-              </div>
 
-              {/* Columna Derecha: Qué Contiene */}
-              {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
-                <div className="sm:w-1/2 p-6 sm:p-8 bg-muted/5 border-l border-border/30 h-full overflow-y-auto">
-                  <h4 className="text-sm uppercase tracking-widest text-primary mb-4 font-bold">¿Qué Contiene?</h4>
-                  <div className="bg-muted/20 border border-border/40 rounded-xl p-5">
-                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
-                      {selectedProduct.contains}
-                    </p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
         </DialogContent>
