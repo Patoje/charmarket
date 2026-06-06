@@ -471,9 +471,9 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
         <DialogContent className="max-w-4xl bg-background border-border/50 shadow-2xl p-0 overflow-hidden">
           {selectedProduct && (
-            <div className="flex flex-col md:flex-row h-full max-h-[85vh]">
+            <div className="flex flex-col sm:flex-row h-full max-h-[85vh]">
               {/* Columna Izquierda: Imagen, Título, Precio y Botón */}
-              <div className="md:w-1/2 p-6 md:p-8 flex flex-col h-full overflow-y-auto bg-background">
+              <div className={`${selectedProduct.contains && selectedProduct.contains.trim() !== "" ? "sm:w-1/2" : "w-full"} p-6 sm:p-8 flex flex-col h-full overflow-y-auto bg-background`}>
                 
                 {/* Imagen */}
                 <div className="relative aspect-square w-full min-h-[250px] mb-6 bg-[#0a0a0a] rounded-xl border border-border/30 overflow-hidden shrink-0">
@@ -494,7 +494,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                       </Badge>
                     )}
                   </div>
-                  <DialogTitle className="font-heading font-bold text-2xl md:text-3xl uppercase tracking-wide leading-tight mb-2">
+                  <DialogTitle className="font-heading font-bold text-2xl sm:text-3xl uppercase tracking-wide leading-tight mb-2">
                     {selectedProduct.name}
                   </DialogTitle>
                   <DialogDescription className="uppercase tracking-widest text-xs font-medium text-muted-foreground">
@@ -543,22 +543,16 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               </div>
 
               {/* Columna Derecha: Qué Contiene */}
-              <div className="md:w-1/2 p-6 md:p-8 bg-muted/5 border-l border-border/30 h-full overflow-y-auto">
-                {selectedProduct.contains && selectedProduct.contains.trim() !== "" ? (
-                  <div>
-                    <h4 className="text-sm uppercase tracking-widest text-primary mb-4 font-bold">¿Qué Contiene?</h4>
-                    <div className="bg-muted/20 border border-border/40 rounded-xl p-5">
-                      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
-                        {selectedProduct.contains}
-                      </p>
-                    </div>
+              {selectedProduct.contains && selectedProduct.contains.trim() !== "" && (
+                <div className="sm:w-1/2 p-6 sm:p-8 bg-muted/5 border-l border-border/30 h-full overflow-y-auto">
+                  <h4 className="text-sm uppercase tracking-widest text-primary mb-4 font-bold">¿Qué Contiene?</h4>
+                  <div className="bg-muted/20 border border-border/40 rounded-xl p-5">
+                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-medium">
+                      {selectedProduct.contains}
+                    </p>
                   </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground/30 text-sm uppercase tracking-widest font-medium">
-                    Sin información de contenido
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
