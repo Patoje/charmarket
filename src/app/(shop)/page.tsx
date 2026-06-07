@@ -6,8 +6,6 @@ import { ArrowRight, ShoppingCart, ArrowDown, MapPin, Lock, Truck, Mail, Package
 import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/FaqAccordion";
 
-export const dynamic = "force-dynamic";
-
 export default async function ShopPage() {
   const products = await getProducts();
   const categories = await getCategories();

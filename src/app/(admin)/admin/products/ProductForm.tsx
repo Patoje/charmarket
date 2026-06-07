@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadButton } from "@/utils/uploadthing";
+import Image from "next/image";
 
 export function ProductForm({ 
   categories, 
@@ -200,7 +201,7 @@ export function ProductForm({
             {/* Si ya hay una imagen, la mostramos */}
             {imageUrl ? (
               <div className="relative group rounded-md overflow-hidden bg-white/5 p-2 flex-shrink-0 border border-border/50 w-32 h-32 flex items-center justify-center">
-                <img src={imageUrl} alt="Preview" className="max-w-full max-h-full object-contain" />
+                <Image src={imageUrl} alt="Preview" width={128} height={128} className="max-w-full max-h-full object-contain" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Button 
                     type="button" 

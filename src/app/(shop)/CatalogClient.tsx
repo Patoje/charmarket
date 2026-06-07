@@ -11,8 +11,32 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ShoppingCart, Filter, Search, ChevronDown, ChevronUp, Globe, Info, PackageOpen, CheckCircle, Share2, Check } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 import { CartDrawer } from "./CartDrawer";
+import Image from "next/image";
 
-export function CatalogClient({ products, categories, dolarValue }: { products: any[], categories: any[], dolarValue: number }) {
+export interface CatalogProduct {
+  id: number;
+  name: string;
+  description: string | null;
+  contains: string | null;
+  imageUrl: string | null;
+  categoryId: number;
+  categoryName: string | null;
+  subCategory: string | null;
+  language: string;
+  priceUsdMinorista: string;
+  priceUsdMayorista: string;
+  stock: number;
+  isActive: boolean;
+}
+
+export interface CatalogCategory {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+
+export function CatalogClient({ products, categories, dolarValue }: { products: CatalogProduct[], categories: CatalogCategory[], dolarValue: number }) {
   const { addItem, items } = useCart();
 
   // Estados de Filtros
@@ -174,15 +198,15 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
 
   // Función simple para generar un emoji representativo si no hay imagen
-  const getProductEmoji = (name: string, category: string) => {
+  const getProductEmoji = (name: string, category: string | null) => {
     const lowerName = name.toLowerCase();
     if (lowerName.includes("pikachu") || lowerName.includes("rayo")) return "⚡";
     if (lowerName.includes("charizard") || lowerName.includes("fuego")) return "🐉";
     if (lowerName.includes("umbreon") || lowerName.includes("luna")) return "🌙";
     if (lowerName.includes("agua") || lowerName.includes("greninja")) return "🌊";
     if (lowerName.includes("sceptile") || lowerName.includes("planta")) return "🌿";
-    if (category.includes("Booster") || category.includes("Sobre")) return "💎";
-    if (category.includes("ETB")) return "📦";
+    if (category?.includes("Booster") || category?.includes("Sobre")) return "💎";
+    if (category?.includes("ETB")) return "📦";
     return "🃏";
   };
 
@@ -212,10 +236,12 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
             className="group relative h-32 md:h-48 border border-border/50 bg-[#1a0c05] overflow-hidden cursor-pointer flex items-center justify-center rounded-sm transition-all duration-300 hover:border-primary/80 shadow-md"
           >
             <div className="absolute inset-0 bg-black/60 z-10 transition-colors duration-300 group-hover:bg-black/40"></div>
-            <img 
+            <Image 
               src={categoryImages[cat.name] || defaultImage} 
               alt={cat.name}
-              className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-40"
+              fill
+              sizes="(max-width: 768px) 50vw, 33vw"
+              className="absolute inset-0 object-cover opacity-20 grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-40"
             />
             <span className="relative z-20 font-heading font-bold text-sm md:text-xl uppercase tracking-widest text-white/90 drop-shadow-md group-hover:text-primary transition-colors">
               {cat.name}
@@ -437,7 +463,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
           const currentQtyInCart = cartItem?.quantity || 0;
           const availableToAdd = product.stock - currentQtyInCart;
 
-          const arsPrice = Math.round(product.priceUsdMinorista * dolarValue);
+          const arsPrice = Math.round(Number(product.priceUsdMinorista) * dolarValue);
           const isOutOfStock = product.stock <= 0;
 
           return (
@@ -469,9 +495,11 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                 </div>
                 
                 {product.imageUrl ? (
-                  <img 
+                  <Image 
                     src={product.imageUrl} 
                     alt={product.name}
+                    width={300}
+                    height={300}
                     className="w-full h-full max-h-[160px] object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
@@ -601,9 +629,11 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               <div className="bg-[#0a0a0a] rounded-xl relative flex items-center justify-center p-6 border border-border/50 shrink-0 self-start mx-auto w-full max-w-[300px]">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-30 rounded-xl"></div>
                 <div className="relative w-full aspect-square">
-                  <img 
+                  <Image 
                     src={selectedProduct.imageUrl || "/placeholder.webp"} 
                     alt={selectedProduct.name}
+                    width={500}
+                    height={500}
                     className="w-full h-full object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -695,7 +725,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                         <p className="text-3xl md:text-4xl font-bold text-primary tracking-tight">USD {Number(selectedProduct.priceUsdMinorista).toFixed(2)}</p>
                       </div>
                       <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium mt-1">
-                        ARS ${(selectedProduct.priceUsdMinorista * dolarValue).toLocaleString("es-AR")}
+                        ARS ${(Number(selectedProduct.priceUsdMinorista) * dolarValue).toLocaleString("es-AR")}
                       </p>
                     </div>
 
