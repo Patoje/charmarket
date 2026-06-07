@@ -59,7 +59,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
         };
       });
 
-      const res = await createCheckoutOrder(customerName, totalUsd, orderItems);
+      const res = await createCheckoutOrder(customerName, totalUsd, totalArs, orderItems);
 
       if (!res.success) {
         if (newWindow) newWindow.close();
@@ -70,11 +70,11 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
 
       const { orderNumber } = res;
 
-      let message = `*Nuevo Pedido Charmarket* 🛒\n*Orden:* ${orderNumber}\n*Cliente:* ${customerName}\n\n`;
+      let message = `*Nuevo Pedido Charmarket*\n*Orden:* ${orderNumber}\n*Cliente:* ${customerName}\n\n`;
       items.forEach((item) => {
         const isMayorista = item.quantity >= 5;
         const price = isMayorista ? Number(item.product.priceUsdMayorista) : Number(item.product.priceUsdMinorista);
-        message += `• ${item.quantity}x ${item.product.name} (USD ${price.toFixed(2)} c/u)\n`;
+        message += `- ${item.quantity}x ${item.product.name} (USD ${price.toFixed(2)} c/u)\n`;
       });
       
       message += `\n*Total USD:* $${totalUsd.toFixed(2)}`;

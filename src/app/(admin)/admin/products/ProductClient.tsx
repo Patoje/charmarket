@@ -14,13 +14,19 @@ import { ProductForm } from "./ProductForm";
 export function ProductClient({ products, categories }: { products: any[], categories: any[] }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [productToDelete, setProductToDelete] = useState<any>(null);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const handleDelete = async (id: number) => {
-    if (confirm("¿Estás seguro de eliminar este producto?")) {
-      await deleteProduct(id);
+  const confirmDelete = (product: any) => {
+    setProductToDelete(product);
+  };
+
+  const executeDelete = async () => {
+    if (productToDelete) {
+      await deleteProduct(productToDelete.id);
+      setProductToDelete(null);
     }
   };
 
@@ -157,7 +163,7 @@ export function ProductClient({ products, categories }: { products: any[], categ
                     <Button variant="outline" size="sm" onClick={() => openEditDialog(product)}>
                       Editar
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(product.id)}>
+                    <Button variant="destructive" size="sm" onClick={() => confirmDelete(product)}>
                       Eliminar
                     </Button>
                   </TableCell>
@@ -184,6 +190,25 @@ export function ProductClient({ products, categories }: { products: any[], categ
             initialData={editingProduct}
             onSuccess={closeDialog} 
           />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Eliminar Producto</DialogTitle>
+            <DialogDescription className="pt-2">
+              ¿Estás seguro de que deseas eliminar <strong>{productToDelete?.name}</strong>? Esta acción borrará el producto del inventario de forma permanente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-4 mt-4">
+            <Button variant="ghost" onClick={() => setProductToDelete(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={executeDelete}>
+              Sí, eliminar
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

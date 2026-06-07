@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { products, categories } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getProducts() {
@@ -23,7 +23,7 @@ export async function getProducts() {
   })
   .from(products)
   .leftJoin(categories, eq(products.categoryId, categories.id))
-  .orderBy(desc(products.id));
+  .orderBy(asc(categories.name), asc(products.name));
 
   return allProducts;
 }
@@ -46,7 +46,7 @@ export async function saveProduct(formData: FormData) {
     const priceUsdMayorista = formData.get("priceUsdMayorista") as string;
     const stock = parseInt(formData.get("stock") as string);
 
-    if (!name || !categoryId || !language || !priceUsdMinorista || !priceUsdMayorista) {
+    if (!name || !categoryId || !language || !priceUsdMinorista) {
       return { error: "Todos los campos obligatorios deben completarse" };
     }
 
@@ -59,7 +59,7 @@ export async function saveProduct(formData: FormData) {
       subCategory: subCategory || null,
       language,
       priceUsdMinorista,
-      priceUsdMayorista,
+      priceUsdMayorista: priceUsdMayorista || "0",
       stock: isNaN(stock) ? 0 : stock,
       isActive: true,
     };

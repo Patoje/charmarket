@@ -56,6 +56,7 @@ export const orders = pgTable("orders", {
   customerPhone: text("customer_phone"),
   status: text("status").notNull().default("pending"), // "pending", "accepted", "rejected", "paid", "shipped", "cancelled"
   totalUsd: numeric("total_usd", { precision: 10, scale: 2 }).notNull(),
+  totalArsSnapshot: numeric("total_ars_snapshot", { precision: 12, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
 });
