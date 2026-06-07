@@ -1,6 +1,7 @@
 import { getProducts, getCategories } from "@/app/actions/products";
 import { getDolarValue } from "@/app/actions/config";
 import { CatalogClient } from "./CatalogClient";
+import { NavLinks } from "./NavLinks";
 import Link from "next/link";
 import { ArrowRight, ShoppingCart, ArrowDown, MapPin, Lock, Truck, Mail, Package, ShieldCheck, CreditCard, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,11 +31,7 @@ export default async function ShopPage() {
               CHARMARKET
             </Link>
           </div>
-          <div className="flex justify-end gap-3 md:gap-6 text-xs md:text-sm font-heading tracking-widest uppercase font-medium text-foreground">
-            <Link href="#catalogo" className="hover:text-primary transition-colors">Catálogo</Link>
-            <Link href="#envios" className="hover:text-primary transition-colors">Envíos</Link>
-            <Link href="#faqs" className="hover:text-primary transition-colors">FAQs</Link>
-          </div>
+          <NavLinks />
         </div>
       </nav>
 
