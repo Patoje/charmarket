@@ -114,15 +114,24 @@ export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="flex flex-col md:flex-row w-full max-w-2xl bg-transparent p-0 h-auto gap-3 md:gap-4">
-          <TabsTrigger value="pending" className="w-full h-12 data-[state=inactive]:bg-transparent hover:bg-transparent data-active:bg-background/80 data-active:border-primary/50 border border-transparent outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all rounded-lg">
-            Pendientes <Badge variant="secondary" className="ml-2 bg-yellow-500/20 text-yellow-600 border-none">{pendientes.length}</Badge>
+        <TabsList className="grid grid-cols-1 md:grid-cols-3 w-full bg-transparent p-0 !h-auto gap-3 md:gap-6">
+          <TabsTrigger 
+            value="pending" 
+            className="w-full h-11 md:h-14 flex items-center justify-center font-heading font-bold uppercase tracking-widest transition-all duration-300 rounded-xl border border-border/50 bg-background/50 hover:bg-background/80 data-active:bg-primary/10 data-active:border-primary data-active:text-primary data-active:shadow-[0_0_15px_rgba(255,165,0,0.15)] outline-none"
+          >
+            Pendientes <Badge variant="secondary" className="ml-3 bg-yellow-500/20 text-yellow-600 border-none px-2">{pendientes.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="accepted" className="w-full h-12 data-[state=inactive]:bg-transparent hover:bg-transparent data-active:bg-background/80 data-active:border-primary/50 border border-transparent outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all rounded-lg">
-            Aceptadas <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-600 border-none">{aceptadas.length}</Badge>
+          <TabsTrigger 
+            value="accepted" 
+            className="w-full h-11 md:h-14 flex items-center justify-center font-heading font-bold uppercase tracking-widest transition-all duration-300 rounded-xl border border-border/50 bg-background/50 hover:bg-background/80 data-active:bg-primary/10 data-active:border-primary data-active:text-primary data-active:shadow-[0_0_15px_rgba(255,165,0,0.15)] outline-none"
+          >
+            Aceptadas <Badge variant="secondary" className="ml-3 bg-green-500/20 text-green-600 border-none px-2">{aceptadas.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="rejected" className="w-full h-12 data-[state=inactive]:bg-transparent hover:bg-transparent data-active:bg-background/80 data-active:border-primary/50 border border-transparent outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all rounded-lg">
-            Rechazadas <Badge variant="secondary" className="ml-2 bg-red-500/20 text-red-600 border-none">{rechazadas.length}</Badge>
+          <TabsTrigger 
+            value="rejected" 
+            className="w-full h-11 md:h-14 flex items-center justify-center font-heading font-bold uppercase tracking-widest transition-all duration-300 rounded-xl border border-border/50 bg-background/50 hover:bg-background/80 data-active:bg-primary/10 data-active:border-primary data-active:text-primary data-active:shadow-[0_0_15px_rgba(255,165,0,0.15)] outline-none"
+          >
+            Rechazadas <Badge variant="secondary" className="ml-3 bg-red-500/20 text-red-600 border-none px-2">{rechazadas.length}</Badge>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="pending" className="mt-6">
