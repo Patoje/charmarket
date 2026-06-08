@@ -86,8 +86,8 @@ export function ProductClient({ products, categories }: { products: any[], categ
 
   return (
     <div className="space-y-4 mt-4">
-      {/* Header — stacks on mobile */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header — Centered */}
+      <div className="flex flex-col items-center justify-center text-center gap-4 mb-6">
         <div>
           <h2 className="text-2xl sm:text-3xl font-heading font-bold tracking-tight text-primary uppercase">
             INVENTARIO
@@ -96,11 +96,9 @@ export function ProductClient({ products, categories }: { products: any[], categ
             Gestiona el catálogo de productos de TCG.
           </p>
         </div>
-        <div className="flex gap-2 shrink-0">
-          <Button onClick={openNewProductDialog} size="sm" className="h-10">
-            <Plus className="mr-2 h-4 w-4" /> Agregar Producto
-          </Button>
-        </div>
+        <Button onClick={openNewProductDialog} size="sm" className="h-10">
+          <Plus className="mr-2 h-4 w-4" /> Agregar Producto
+        </Button>
       </div>
 
       {/* Table with horizontal scroll on small screens */}
@@ -108,15 +106,15 @@ export function ProductClient({ products, categories }: { products: any[], categ
         <Table className="min-w-[640px]">
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[140px]">Nombre</TableHead>
-              <TableHead className="min-w-[110px]">Categoría</TableHead>
+              <TableHead className="min-w-[140px] text-center">Nombre</TableHead>
+              <TableHead className="min-w-[110px] text-center">Categoría</TableHead>
               {/* Hidden on small, visible on md+ */}
-              <TableHead className="hidden md:table-cell min-w-[120px]">Era / Subcat.</TableHead>
-              <TableHead className="hidden sm:table-cell min-w-[80px]">Idioma</TableHead>
-              <TableHead className="min-w-[90px]">Precio Min.</TableHead>
-              <TableHead className="hidden md:table-cell min-w-[90px]">Precio May.</TableHead>
-              <TableHead className="min-w-[110px]">Stock</TableHead>
-              <TableHead className="text-right min-w-[130px]">Acciones</TableHead>
+              <TableHead className="hidden md:table-cell min-w-[120px] text-center">Era / Subcat.</TableHead>
+              <TableHead className="hidden sm:table-cell min-w-[80px] text-center">Idioma</TableHead>
+              <TableHead className="min-w-[90px] text-center">Precio Min.</TableHead>
+              <TableHead className="hidden md:table-cell min-w-[90px] text-center">Precio May.</TableHead>
+              <TableHead className="min-w-[110px] text-center">Stock</TableHead>
+              <TableHead className="text-center min-w-[130px]">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -129,30 +127,30 @@ export function ProductClient({ products, categories }: { products: any[], categ
             ) : (
               products.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell className="font-medium max-w-[160px]">
+                  <TableCell className="font-medium max-w-[160px] text-center">
                     <span className="block truncate" title={product.name}>
                       {product.name}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Badge variant="secondary" className="whitespace-nowrap">
                       {product.categoryName}
                     </Badge>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden md:table-cell text-center">
                     {product.subCategory ? (
                       <Badge variant="outline">{product.subCategory}</Badge>
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">{product.language}</TableCell>
-                  <TableCell className="whitespace-nowrap">USD {product.priceUsdMinorista}</TableCell>
-                  <TableCell className="hidden md:table-cell whitespace-nowrap">
+                  <TableCell className="hidden sm:table-cell text-center">{product.language}</TableCell>
+                  <TableCell className="whitespace-nowrap text-center">USD {product.priceUsdMinorista}</TableCell>
+                  <TableCell className="hidden md:table-cell whitespace-nowrap text-center">
                     USD {product.priceUsdMayorista}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center justify-center gap-1.5">
                       <Button
                         variant="outline"
                         size="icon"
@@ -172,8 +170,8 @@ export function ProductClient({ products, categories }: { products: any[], categ
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-1.5 justify-end flex-wrap">
+                  <TableCell className="text-center">
+                    <div className="flex gap-1.5 justify-center flex-wrap">
                       <Button variant="outline" size="sm" onClick={() => openEditDialog(product)}>
                         Editar
                       </Button>

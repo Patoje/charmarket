@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { products, categories } from "@/db/schema";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getProducts() {
@@ -23,6 +23,7 @@ export async function getProducts() {
   })
   .from(products)
   .leftJoin(categories, eq(products.categoryId, categories.id))
+  .where(isNull(products.deletedAt))
   .orderBy(asc(categories.name), asc(products.name));
 
   return allProducts;
@@ -83,11 +84,19 @@ export async function saveProduct(formData: FormData) {
 
 export async function deleteProduct(id: number) {
   try {
-    await db.delete(products).where(eq(products.id, id));
+    // Check if product is referenced in orderItems
+    // Since we don't import orderItems here, we can just try to delete, 
+    // and if it fails due to foreign key, we catch and soft delete.
+    // Actually, safer to just always soft delete if we want to preserve history, 
+    // or we can just catch the specific error.
+    // Let's just do a soft delete for all products to be safe and avoid breaking order history.
+    await db.update(products).set({ isActive: false, deletedAt: new Date() }).where(eq(products.id, id));
+    
     revalidatePath("/admin/products");
     revalidatePath("/");
     return { success: true };
   } catch (error) {
+    console.error("Error al eliminar el producto:", error);
     return { error: "Error al eliminar el producto" };
   }
 }
