@@ -84,9 +84,8 @@ export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue
                     onClick={() => handleAction(order.id, "reject")}
                     disabled={loadingId !== null}
                   >
-                    <X className="w-3.5 h-3.5 mr-1.5" /> 
-                    <span className="hidden sm:inline">Rechazar orden</span>
-                    <span className="inline sm:hidden">Rechazar</span>
+                    <X className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
+                    <span>Rechazar</span>
                   </Button>
                   <Button 
                     size="sm"
@@ -95,8 +94,8 @@ export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue
                     disabled={loadingId !== null}
                   >
                     <Check className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
-                    <span className="hidden sm:inline">Aceptar y descontar stock</span>
-                    <span className="inline sm:hidden">Aceptar</span>
+                    <span className="max-sm:hidden">Aceptar y descontar stock</span>
+                    <span className="sm:hidden">Aceptar</span>
                   </Button>
                 </div>
               )}
