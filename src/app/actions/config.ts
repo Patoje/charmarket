@@ -20,11 +20,20 @@ export async function updateDolarValue(formData: FormData) {
   }
 
   try {
-    await db.update(globalConfigs)
-      .set({ value: value, updatedAt: new Date() })
-      .where(eq(globalConfigs.key, "dolar_charmarket"));
+    const existing = await db.query.globalConfigs.findFirst({
+      where: eq(globalConfigs.key, "dolar_charmarket")
+    });
 
-    revalidatePath("/admin");
+    if (existing) {
+      await db.update(globalConfigs)
+        .set({ value: value, updatedAt: new Date() })
+        .where(eq(globalConfigs.key, "dolar_charmarket"));
+    } else {
+      await db.insert(globalConfigs)
+        .values({ key: "dolar_charmarket", value: value });
+    }
+
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error) {
     console.error("Error al actualizar el dólar:", error);
