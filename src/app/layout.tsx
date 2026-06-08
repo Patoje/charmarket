@@ -32,11 +32,11 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${cinzel.variable} ${raleway.variable} h-full antialiased dark`}
+      className={`${cinzel.variable} ${raleway.variable} h-full antialiased dark overflow-x-hidden`}
       suppressHydrationWarning
     >
       {/* FORZADO A MODO OSCURO: Por decisión de marca (Estética Charmander) no se soporta modo claro */}
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-background text-foreground font-sans overflow-x-hidden" suppressHydrationWarning>
         {/* Skip Link para accesibilidad */}
         <a 
           href="#main-content" 

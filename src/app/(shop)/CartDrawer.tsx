@@ -103,22 +103,22 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-      <SheetTrigger 
+      <SheetTrigger
         className={cn(
-          "fixed bottom-8 right-8 h-16 w-16 rounded-full shadow-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-transform",
+          "fixed bottom-5 right-4 sm:bottom-8 sm:right-8 h-14 w-14 sm:h-16 sm:w-16 rounded-full shadow-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-transform z-40",
           animate && "scale-110"
         )}
       >
-        <ShoppingCart className="h-6 w-6" />
+        <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
         {totalItems > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+          <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center">
             {totalItems}
           </span>
         )}
       </SheetTrigger>
       <SheetContent className="flex flex-col w-full sm:max-w-2xl p-6 sm:p-8 bg-card border-l border-border">
         <SheetHeader className="mb-6">
-          <SheetTitle className="font-heading text-2xl tracking-wide">Tu Carrito ({totalItems})</SheetTitle>
+          <SheetTitle className="font-heading text-xl tracking-wide">Tu Carrito ({totalItems})</SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto py-2 space-y-6 pr-2">
@@ -132,10 +132,10 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
               return (
                 <div key={item.product.id} className="flex justify-between items-center border-b border-border/40 pb-5">
                   <div className="flex-1 pr-4">
-                    <h4 className="font-heading font-bold text-base tracking-wide uppercase">{item.product.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-2 tracking-wider">
+                    <h4 className="font-heading font-bold text-sm tracking-wide uppercase">{item.product.name}</h4>
+                    <p className="text-[11px] text-muted-foreground mt-1.5 tracking-wider">
                       USD {unitPriceUsd.toFixed(2)} c/u 
-                      {isMayorista && <span className="ml-3 text-primary font-bold">¡Precio Mayorista!</span>}
+                      {isMayorista && <span className="ml-2 text-primary font-bold">¡Precio Mayorista!</span>}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -168,12 +168,12 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
           <div className="border-t border-border/40 pt-6 space-y-6 mt-4">
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Total USD</p>
-                <p className="text-xl font-bold">USD {totalUsd.toFixed(2)}</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Total USD</p>
+                <p className="text-lg font-bold">USD {totalUsd.toFixed(2)}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Total Pesos (Dólar: ${dolarValue})</p>
-                <p className="text-4xl font-heading font-bold text-primary">ARS ${Math.round(totalArs).toLocaleString("es-AR")}</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Total Pesos (Dólar: ${dolarValue})</p>
+                <p className="text-2xl font-heading font-bold text-primary">ARS ${Math.round(totalArs).toLocaleString("es-AR")}</p>
               </div>
             </div>
             
@@ -186,7 +186,7 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
                   if (e.target.value.trim()) setNameError("");
                 }}
                 className={cn(
-                  "h-12 border-border focus-visible:ring-primary font-bold",
+                  "h-10 text-sm border-border focus-visible:ring-primary font-bold",
                   nameError && "border-destructive focus-visible:ring-destructive"
                 )}
               />
@@ -204,11 +204,11 @@ export function CartDrawer({ dolarValue }: { dolarValue: number }) {
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-12 rounded-lg text-xs uppercase tracking-widest font-bold border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={clearCart}>
+              <Button variant="outline" className="h-10 rounded-lg text-[10px] uppercase tracking-widest font-bold border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={clearCart}>
                 Vaciar Carrito
               </Button>
-              <Button onClick={handleCheckout} disabled={isSubmitting} className="h-12 rounded-lg text-[10px] sm:text-xs uppercase tracking-widest font-bold bg-[#25D366] hover:bg-[#128C7E] text-white border-none shadow-lg shadow-[#25D366]/20">
-                {isSubmitting ? "Procesando..." : "Pedir por WhatsApp"}
+              <Button onClick={handleCheckout} disabled={isSubmitting} className="h-10 rounded-lg text-[10px] uppercase tracking-widest font-bold bg-[#25D366] hover:bg-[#128C7E] text-white border-none shadow-lg shadow-[#25D366]/20">
+                {isSubmitting ? "Procesando..." : "Pedir WhatsApp"}
               </Button>
             </div>
           </div>

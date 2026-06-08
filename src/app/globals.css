@@ -3,6 +3,11 @@
 @import "shadcn/tailwind.css";
 @import "@uploadthing/react/styles.css";
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -330,7 +330,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
         {/* Filtros Avanzados Colapsables */}
         {showAdvanced && (
-          <div className="mt-6 pt-6 border-t border-border/50 grid grid-cols-1 md:grid-cols-5 gap-6 animate-in slide-in-from-top-2 fade-in duration-200">
+          <div className="mt-6 pt-6 border-t border-border/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 animate-in slide-in-from-top-2 fade-in duration-200">
             
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">Idioma</Label>
@@ -388,7 +388,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
               </div>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 sm:col-span-2 lg:col-span-2">
               <Label className="text-xs uppercase tracking-widest text-muted-foreground">Rango de Precio</Label>
               <div className="flex flex-wrap items-center gap-2">
                 <Select value={priceCurrency} onValueChange={(val: any) => {
@@ -621,7 +621,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
       {/* Modal de Detalle de Producto */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
-        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-4xl md:max-w-5xl w-full bg-background border-border/50 shadow-2xl p-6 md:p-8 rounded-2xl overflow-hidden">
+        <DialogContent className="w-[calc(100%-1.5rem)] sm:max-w-4xl md:max-w-5xl bg-background border-border/50 shadow-2xl p-4 sm:p-6 md:p-8 rounded-2xl overflow-y-auto overflow-x-hidden max-h-[90svh]">
           {selectedProduct && (
             <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-auto">
               
@@ -656,7 +656,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
                 {/* Título e Idioma */}
                 <div className="flex justify-between items-start gap-4 mb-2">
-                  <DialogTitle className="font-heading font-bold text-3xl md:text-4xl uppercase tracking-wide leading-tight text-foreground">
+                  <DialogTitle className="font-heading font-bold text-xl sm:text-2xl md:text-4xl uppercase tracking-wide leading-tight text-foreground">
                     {selectedProduct.name}
                   </DialogTitle>
                   <div className="relative flex flex-col items-center">
@@ -715,9 +715,9 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                 </div>
 
                 {/* Footer: Precio, Stock, Botón (Fijo al fondo de la columna) */}
-                <div className="mt-auto pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="mt-auto pt-5 border-t border-border/50 flex flex-col gap-5">
                   
-                  <div className="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-start">
+                  <div className="flex items-center gap-12 sm:gap-16 justify-center sm:justify-start mb-2">
                     {/* Precio */}
                     <div className="flex flex-col gap-1">
                       <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Precio</p>
@@ -730,7 +730,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
                     </div>
 
                     {/* Stock */}
-                    <div className="flex flex-col gap-1 text-right sm:text-left">
+                    <div className="flex flex-col gap-1 text-center sm:text-left">
                       <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Stock</p>
                       <p className={`text-xl md:text-2xl font-bold tracking-tight ${selectedProduct.stock > 0 ? "text-foreground" : "text-destructive"}`}>
                         {selectedProduct.stock > 0 ? `${selectedProduct.stock} u.` : "Agotado"}
@@ -740,7 +740,7 @@ export function CatalogClient({ products, categories, dolarValue }: { products: 
 
                   {/* Botón Añadir */}
                   <Button 
-                    className={`w-full sm:w-auto h-14 px-8 text-sm uppercase tracking-widest font-black active:scale-[0.98] transition-all duration-300 rounded-xl shadow-lg hover:shadow-primary/25 shrink-0 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/25" : ""}`} 
+                    className={`w-[80%] max-w-[250px] mx-auto h-12 px-8 text-xs uppercase tracking-widest font-black active:scale-[0.98] transition-all duration-300 rounded-xl shadow-lg hover:shadow-primary/25 shrink-0 ${addedFeedback ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/25" : ""}`} 
                     disabled={selectedProduct.stock - (items.find((i: any) => i.product.id === selectedProduct.id)?.quantity || 0) <= 0}
                     onClick={() => {
                       addItem(selectedProduct);

@@ -79,18 +79,24 @@ export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue
                 <div className="flex gap-4 justify-end pt-4 border-t border-border/20">
                   <Button 
                     variant="outline" 
-                    className="border-red-500 text-red-500 hover:bg-red-500/10"
+                    size="sm"
+                    className="border-red-500 text-red-500 hover:bg-red-500/10 text-xs px-3"
                     onClick={() => handleAction(order.id, "reject")}
                     disabled={loadingId !== null}
                   >
-                    <X className="w-4 h-4 mr-2" /> Rechazar
+                    <X className="w-3.5 h-3.5 mr-1.5" /> 
+                    <span className="hidden sm:inline">Rechazar orden</span>
+                    <span className="inline sm:hidden">Rechazar</span>
                   </Button>
                   <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs px-3"
                     onClick={() => handleAction(order.id, "accept")}
                     disabled={loadingId !== null}
                   >
-                    <Check className="w-4 h-4 mr-2" /> Aceptar y Descontar Stock
+                    <Check className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
+                    <span className="hidden sm:inline">Aceptar y descontar stock</span>
+                    <span className="inline sm:hidden">Aceptar</span>
                   </Button>
                 </div>
               )}
@@ -109,14 +115,14 @@ export function OrdersClient({ orders, dolarValue }: { orders: any[], dolarValue
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md bg-muted/50 p-1">
-          <TabsTrigger value="pending" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsList className="flex flex-col md:flex-row w-full max-w-2xl bg-transparent p-0 h-auto gap-3 md:gap-4">
+          <TabsTrigger value="pending" className="w-full h-12 data-[state=inactive]:bg-transparent hover:bg-transparent data-active:bg-background/80 data-active:border-primary/50 border border-transparent outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all rounded-lg">
             Pendientes <Badge variant="secondary" className="ml-2 bg-yellow-500/20 text-yellow-600 border-none">{pendientes.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="accepted" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="accepted" className="w-full h-12 data-[state=inactive]:bg-transparent hover:bg-transparent data-active:bg-background/80 data-active:border-primary/50 border border-transparent outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all rounded-lg">
             Aceptadas <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-600 border-none">{aceptadas.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="rejected" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="rejected" className="w-full h-12 data-[state=inactive]:bg-transparent hover:bg-transparent data-active:bg-background/80 data-active:border-primary/50 border border-transparent outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all rounded-lg">
             Rechazadas <Badge variant="secondary" className="ml-2 bg-red-500/20 text-red-600 border-none">{rechazadas.length}</Badge>
           </TabsTrigger>
         </TabsList>

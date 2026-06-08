@@ -6,7 +6,7 @@ import { login } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, User } from "lucide-react";
+import { ArrowLeft, Lock, User } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -32,7 +32,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative">
+      {/* Botón volver */}
+      <Link
+        href="/"
+        className="absolute top-4 left-4 inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors font-medium"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Volver
+      </Link>
+
       <Link href="/" className="font-heading font-bold text-3xl tracking-wider text-primary mb-8 hover:opacity-80 transition-opacity">
         CHARMARKET
       </Link>
